@@ -17,3 +17,7 @@
 
 # Binaries
 a.out
+
+# Others
+*.bkp
+*.old
