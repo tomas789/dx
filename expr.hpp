@@ -95,6 +95,7 @@ struct add : public function_base { constexpr static std::size_t arity = 2; };
 struct sub : public function_base { constexpr static std::size_t arity = 2; };
 struct mul : public function_base { constexpr static std::size_t arity = 2; };
 struct div : public function_base { constexpr static std::size_t arity = 2; };
+struct pow : public function_base { constexpr static std::size_t arity = 2; };
 
 /**
  * Compile time type property deduction
@@ -316,6 +317,10 @@ inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
 
 /*******************************************************
  *****   function<div> template specialisations    *****
+ *******************************************************/
+
+/*******************************************************
+ *****   function<pow> template specialisations    *****
  *******************************************************/
 
 #endif
