@@ -65,6 +65,8 @@ template <std::size_t Arity>
 class n_ary : public expr {
 protected:
 	std::array<expr::ptr_type, Arity> childs;
+
+    template <class T, class U> friend class function;
 };
 
 /**
@@ -143,6 +145,7 @@ public:
 	 *
 	 * TODO : Is possible to simply pass more then one parameter
 	 *        without additional encapsulation (pair, tuple, vector, ...)?
+	 * TODO : define template <class T> function<T>::operator std::string();
 	 */
 	template <
             typename U = T, 
@@ -182,8 +185,11 @@ expr::ptr_type construct(typename T::value_type v) {
 /**
  * Required prototypes
  */
-template <> template <> 
-inline function<constant>::function(const constant::value_type& val);
+//template <> template <> 
+//inline function<constant>::function(const constant::value_type& val);
+
+//template <> template <>
+//inline function<variable>::function(const variable::value_type& val);
 
 /*******************************************************
  ***** function<variable> template specialisations *****
@@ -271,7 +277,7 @@ inline expr::ptr_type function<sub>::derive(
         const expr::valuation_type::size_type& var) {
     auto *p = new function<sub>;
     p->childs[0] = std::move(n_ary::childs[0]->derive(var));
-    p->childs[1] = std::move(n_ary::childs[0]->derive(var));
+    p->childs[1] = std::move(n_ary::childs[1]->derive(var));
     return ptr_type(p);
 }
 
@@ -285,6 +291,28 @@ inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
 /*******************************************************
  *****   function<mul> template specialisations    *****
  *******************************************************/
+
+template <>
+inline expr::ptr_type function<mul>::derive(
+        const expr::valuation_type::size_type& var) {
+    auto *add_lhs = new function<mul>;
+    add_lhs->childs[0] = std::move(n_ary::childs[0]->derive(var));
+    add_lhs->childs[1] = std::move(n_ary::childs[1]->clone());
+    auto *add_rhs = new function<mul>;
+    add_rhs->childs[0] = std::move(n_ary::childs[0]->clone());
+    add_rhs->childs[1] = std::move(n_ary::childs[1]->derive(var));
+    auto *res = new function<add>;
+    res->childs[0] = std::move(ptr_type(add_lhs));
+    res->childs[1] = std::move(ptr_type(add_rhs));
+    return ptr_type(res);
+}
+
+template <> inline expr::string_type function<mul>::to_string()
+{ return n_ary::childs[0]->to_string() + "*" + n_ary::childs[1]->to_string(); }
+
+template <>
+inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
+{ return n_ary::childs[0]->eval(val) * n_ary::childs[1]->eval(val); }
 
 /*******************************************************
  *****   function<div> template specialisations    *****
