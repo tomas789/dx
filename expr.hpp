@@ -248,7 +248,7 @@ inline expr::eval_type function<constant>::eval(const expr::valuation_type&)
 
 template <> 
 inline expr::ptr_type function<add>::derive(
-    const expr::valuation_type::size_type& var) { 
+        const expr::valuation_type::size_type& var) { 
 	auto *p = new function<add>;
 	p->childs[0] = std::move(n_ary::childs[0]->derive(var));
 	p->childs[1] = std::move(n_ary::childs[1]->derive(var));
@@ -260,11 +260,27 @@ template <> inline expr::string_type function<add>::to_string()
 
 template <> 
 inline expr::eval_type function<add>::eval(const expr::valuation_type& val) 
-{ return n_ary::childs[0]->eval(val) + n_ary::childs[0]->eval(val); }
+{ return n_ary::childs[0]->eval(val) + n_ary::childs[1]->eval(val); }
 
 /*******************************************************
  *****   function<sub> template specialisations    *****
  *******************************************************/
+
+template <>
+inline expr::ptr_type function<sub>::derive(
+        const expr::valuation_type::size_type& var) {
+    auto *p = new function<sub>;
+    p->childs[0] = std::move(n_ary::childs[0]->derive(var));
+    p->childs[1] = std::move(n_ary::childs[0]->derive(var));
+    return ptr_type(p);
+}
+
+template <> inline expr::string_type function<sub>::to_string()
+{ return n_ary::childs[0]->to_string() + "-" + n_ary::childs[1]->to_string(); }
+
+template <>
+inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
+{ return n_ary::childs[0]->eval(val) - n_ary::childs[1]->eval(val); }
 
 /*******************************************************
  *****   function<mul> template specialisations    *****
