@@ -144,7 +144,12 @@ public:
 	 * TODO : Is possible to simply pass more then one parameter
 	 *        without additional encapsulation (pair, tuple, vector, ...)?
 	 */
-	template <typename U = T, typename std::enable_if<has_value<U>::value>::type...>
+	template <
+            typename U = T, 
+            typename std::enable_if<
+                    has_value<U>::value
+                >::type ...
+        >
 	function(const typename U::value_type& value);
 
     function() {};	
@@ -191,7 +196,7 @@ inline function<variable>::function(const variable::value_type& vnum)
 template <> 
 inline expr::ptr_type function<variable>::derive(
     const expr::valuation_type::size_type& n)
-{ return ptr_type(new function<constant>(/*n == var_num ? 1 : 0*/)); }
+{ return ptr_type(new function<constant>(n == var_num ? 1 : 0)); }
 
 template <> inline expr::string_type function<variable>::to_string()
 { return "x_" + std::to_string(variable::var_num); }
@@ -212,7 +217,7 @@ inline function<constant>::function(const constant::value_type& val)
 template <> 
 inline expr::ptr_type function<constant>::derive(
     const expr::valuation_type::size_type&) 
-{ return ptr_type(new function<constant>(/*0*/)); }
+{ return ptr_type(new function<constant>(0)); }
 
 template <> inline expr::string_type function<constant>::to_string() 
 { return std::to_string(constant::c); }
