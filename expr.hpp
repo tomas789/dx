@@ -74,13 +74,13 @@ struct function_base { };
 
 struct variable : public function_base { 
 	constexpr static std::size_t arity = 0;
-	using value_type = expr::valuation_type::size_type;
+    typedef expr::valuation_type::size_type value_type;
 	value_type var_num;
 };
 
 struct constant : public function_base { 
 	constexpr static std::size_t arity = 0; 
-	using value_type = expr::eval_type;
+    typedef expr::eval_type value_type;
 	value_type c;
 };
 
@@ -144,8 +144,11 @@ public:
 	 * TODO : Is possible to simply pass more then one parameter
 	 *        without additional encapsulation (pair, tuple, vector, ...)?
 	 */
-	template <class = typename std::enable_if<has_value<T>::value, typename T::value_type&>::type>
-	function(const typename T::value_type& value);
+	template <typename U = T, typename std::enable_if<has_value<U>::value>::type...>
+	function(const typename U::value_type& value);
+
+    function() {};	
+    explicit function(const function<T>&) { };
 
 	virtual expr::ptr_type derive(const expr::valuation_type::size_type& var);
 	
@@ -188,7 +191,7 @@ inline function<variable>::function(const variable::value_type& vnum)
 template <> 
 inline expr::ptr_type function<variable>::derive(
     const expr::valuation_type::size_type& n)
-{ return ptr_type(new function<constant>(n == var_num ? 1 : 0)); }
+{ return ptr_type(new function<constant>(/*n == var_num ? 1 : 0*/)); }
 
 template <> inline expr::string_type function<variable>::to_string()
 { return "x_" + std::to_string(variable::var_num); }
@@ -209,7 +212,7 @@ inline function<constant>::function(const constant::value_type& val)
 template <> 
 inline expr::ptr_type function<constant>::derive(
     const expr::valuation_type::size_type&) 
-{ return ptr_type(new function<constant>(0)); }
+{ return ptr_type(new function<constant>(/*0*/)); }
 
 template <> inline expr::string_type function<constant>::to_string() 
 { return std::to_string(constant::c); }
@@ -238,14 +241,21 @@ inline expr::eval_type function<constant>::eval(const expr::valuation_type&)
  *****   function<add> template specialisations    *****
  *******************************************************/
 
-/*
-template <> inline expr::ptr_type function<add>::derive(const expr::valuation_type::size_type&)
-{ 
+template <> 
+inline expr::ptr_type function<add>::derive(
+    const expr::valuation_type::size_type& var) { 
 	auto *p = new function<add>;
-	p->childs[0] = std::move(n_ary::childs[0]->derive());
-	p->childs[1] = std::move(n_ary::childs[1]->derive());
+	p->childs[0] = std::move(n_ary::childs[0]->derive(var));
+	p->childs[1] = std::move(n_ary::childs[1]->derive(var));
 	return ptr_type(p);
-} */
+}
+
+template <> inline expr::string_type function<add>::to_string()
+{ return n_ary::childs[0]->to_string() + "+" + n_ary::childs[1]->to_string(); }
+
+template <> 
+inline expr::eval_type function<add>::eval(const expr::valuation_type& val) 
+{ return n_ary::childs[0]->eval(val) + n_ary::childs[0]->eval(val); }
 
 /*******************************************************
  *****   function<sub> template specialisations    *****
