@@ -12,3 +12,8 @@
 *.la
 *.a
 
+# Vim temporaries
+.*.swp
+
+# Binaries
+a.out
