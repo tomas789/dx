@@ -243,7 +243,10 @@ inline expr::ptr_type function<struct sin>::derive(
         const expr::valuation_type::size_type& var) {
     auto *p = new function<struct cos>;
     p->childs[0] = std::move(n_ary::childs[0]->clone());
-    return ptr_type(p);
+    auto *m = new function<mul>;
+    m->childs[0] = std::move(ptr_type(p));
+    m->childs[1] = std::move(n_ary::childs[0]->derive(var));
+    return ptr_type(m);
 }
 
 template <> inline expr::string_type function<struct sin>::to_string()
