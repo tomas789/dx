@@ -247,7 +247,7 @@ inline expr::ptr_type function<struct sin>::derive(
 }
 
 template <> inline expr::string_type function<struct sin>::to_string()
-{ return "sin(" + n_ary::childs[0]->to_string() + ")"; };
+{ return "sin(" + n_ary::childs[0]->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<struct sin>::eval(
@@ -257,6 +257,28 @@ inline expr::eval_type function<struct sin>::eval(
 /*******************************************************
  *****   function<cos> template specialisations    *****
  *******************************************************/
+
+template <>
+inline expr::ptr_type function<struct cos>::derive(
+        const expr::valuation_type::size_type& var) {
+    auto *s = new function<struct sin>;
+    s->childs[0] = std::move(n_ary::childs[0]->clone());
+    auto *p = new function<mul>;
+    p->childs[0] = std::move(ptr_type(s));
+    p->childs[1] = std::move(n_ary::childs[0]->derive(var));
+    auto *m = new function<mul>;
+    m->childs[0] = std::move(ptr_type(new function<constant>(-1)));
+    m->childs[1] = std::move(ptr_type(p));
+    return ptr_type(m);
+}
+
+template <> inline expr::string_type function<struct cos>::to_string()
+{ return "cos(" + n_ary::childs[0]->to_string() + ")"; }
+
+template <>
+inline expr::eval_type function<struct cos>::eval(
+        const expr::valuation_type& val)
+{ return std::cos(n_ary::childs[0]->eval(val)); }
 
 /*******************************************************
  *****   function<tan> template specialisations    *****
