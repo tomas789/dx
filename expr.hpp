@@ -238,6 +238,22 @@ inline expr::eval_type function<constant>::eval(const expr::valuation_type&)
  *****   function<sin> template specialisations    *****
  *******************************************************/
 
+template <>
+inline expr::ptr_type function<struct sin>::derive(
+        const expr::valuation_type::size_type& var) {
+    auto *p = new function<struct cos>;
+    p->childs[0] = std::move(n_ary::childs[0]->clone());
+    return ptr_type(p);
+}
+
+template <> inline expr::string_type function<struct sin>::to_string()
+{ return "sin(" + n_ary::childs[0]->to_string() + ")"; };
+
+template <>
+inline expr::eval_type function<struct sin>::eval(
+        const expr::valuation_type& val)
+{ return std::sin(n_ary::childs[0]->eval(val)); }
+
 /*******************************************************
  *****   function<cos> template specialisations    *****
  *******************************************************/
@@ -251,19 +267,19 @@ inline expr::eval_type function<constant>::eval(const expr::valuation_type&)
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<log>::derive(
+inline expr::ptr_type function<struct log>::derive(
         const expr::valuation_type::size_type& var) {
-    auto *p = new function<div>;
-    p->childs[0] = std::move(n_ary::childs[0]->derive());
-    p->childs[1] = std::move(n_ary::childs[1]->clone());
+    auto *p = new function<struct div>;
+    p->childs[0] = std::move(n_ary::childs[0]->derive(var));
+    p->childs[1] = std::move(n_ary::childs[0]->clone());
     return ptr_type(p);
 }
 
-template <> inline expr::string_type function<log>::to_string()
+template <> inline expr::string_type function<struct log>::to_string()
 { return "log(" + n_ary::childs[0]->to_string() + ")"; };
 
 template <>
-inline expr::eval_type function<log>::eval(const expr::valuation_type& val)
+inline expr::eval_type function<struct log>::eval(const expr::valuation_type& val)
 { return std::log(n_ary::childs[0]->eval(val)); }
 
 /*******************************************************
