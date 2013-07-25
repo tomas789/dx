@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <type_traits>
+#include <cmath>
 
 /**
  * Virtual super-class for expression tree
@@ -248,6 +249,22 @@ inline expr::eval_type function<constant>::eval(const expr::valuation_type&)
 /*******************************************************
  *****   function<log> template specialisations    *****
  *******************************************************/
+
+template <>
+inline expr::ptr_type function<log>::derive(
+        const expr::valuation_type::size_type& var) {
+    auto *p = new function<div>;
+    p->childs[0] = std::move(n_ary::childs[0]->derive());
+    p->childs[1] = std::move(n_ary::childs[1]->clone());
+    return ptr_type(p);
+}
+
+template <> inline expr::string_type function<log>::to_string()
+{ return "log(" + n_ary::childs[0]->to_string() + ")"; };
+
+template <>
+inline expr::eval_type function<log>::eval(const expr::valuation_type& val)
+{ return std::log(n_ary::childs[0]->eval(val)); }
 
 /*******************************************************
  *****   function<add> template specialisations    *****
