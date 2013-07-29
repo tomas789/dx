@@ -48,19 +48,19 @@ using tree_type = std::unique_ptr<expr>;
  * Child (subtree) container.
  *
  * TODO : What is more appropriete polymorphic hierarchy?
- * +------+    +-------+    +----------+
- * | expr | <- | n_ary | <- | function |
- * +------+    +-------+    +----------+
+ *           +------+    +-------+    +----------+
+ *           | expr | <- | n_ary | <- | function |
+ *           +------+    +-------+    +----------+
  *
- *               OR
+ *                          OR
  *
- * +------+    +----------+
- * | expr | <- | function |
- * +------+    +----------+
- *              /
- * +-------+   /
- * | n_ary | <-
- * +-------+
+ *           +------+    +----------+
+ *           | expr | <- | function |
+ *           +------+    +----------+
+ *                        /
+ *           +-------+   /
+ *           | n_ary | <-
+ *           +-------+
  */
 template <std::size_t Arity>
 class n_ary : public expr {
@@ -68,6 +68,7 @@ protected:
 	std::array<expr::ptr_type, Arity> childs;
 
     template <class T, class U> friend class function;
+    friend tree_type build(const std::string& str);
 };
 
 /**
@@ -78,13 +79,13 @@ struct function_base { };
 struct variable : public function_base { 
 	constexpr static std::size_t arity = 0;
     typedef expr::valuation_type::size_type value_type;
-	value_type var_num;
+	value_type value;
 };
 
 struct constant : public function_base { 
 	constexpr static std::size_t arity = 0; 
     typedef expr::eval_type value_type;
-	value_type c;
+	value_type value;
 };
 
 struct sin : public function_base { constexpr static std::size_t arity = 1; };
@@ -157,8 +158,11 @@ public:
         >
 	function(const typename U::value_type& value);
 
-    function() {};	
-    explicit function(const function<T>&) { };
+    function() {};
+    explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
+		for (std::size_t i = 0; i < T::arity; ++i)
+			n_ary<T::arity>::childs[i] = std::move(a.childs[i]->clone());
+	};
 
 	virtual expr::ptr_type derive(const expr::valuation_type::size_type& var);
 	
@@ -187,8 +191,8 @@ expr::ptr_type construct(typename T::value_type v) {
 /**
  * Required prototypes
  */
-//template <> template <> 
-//inline function<constant>::function(const constant::value_type& val);
+template <> template <> 
+inline function<constant>::function(const constant::value_type& val);
 
 //template <> template <>
 //inline function<variable>::function(const variable::value_type& val);
@@ -199,20 +203,20 @@ expr::ptr_type construct(typename T::value_type v) {
 
 template <> template <> 
 inline function<variable>::function(const variable::value_type& vnum)
-{ variable::var_num = vnum; }
+{ variable::value = vnum; }
 
 template <> 
 inline expr::ptr_type function<variable>::derive(
     const expr::valuation_type::size_type& n)
-{ return ptr_type(new function<constant>(n == var_num ? 1 : 0)); }
+{ return ptr_type(new function<constant>(n == variable::value ? 1 : 0)); }
 
 template <> inline expr::string_type function<variable>::to_string()
-{ return "x_" + std::to_string(variable::var_num); }
+{ return "x_" + std::to_string(variable::value); }
 
 template <> 
 inline expr::eval_type function<variable>::eval(
     const expr::valuation_type& values)
-{ return values[variable::var_num]; }
+{ return values[variable::value]; }
 
 /*******************************************************
  ***** function<constant> template specialisations *****
@@ -220,7 +224,7 @@ inline expr::eval_type function<variable>::eval(
 
 template <> template <> 
 inline function<constant>::function(const constant::value_type& val)
-{ constant::c = val; }
+{ constant::value = val; }
 
 template <> 
 inline expr::ptr_type function<constant>::derive(
@@ -228,11 +232,11 @@ inline expr::ptr_type function<constant>::derive(
 { return ptr_type(new function<constant>(0)); }
 
 template <> inline expr::string_type function<constant>::to_string() 
-{ return std::to_string(constant::c); }
+{ return std::to_string(constant::value); }
 
 template <> 
 inline expr::eval_type function<constant>::eval(const expr::valuation_type&) 
-{ return constant::c; }
+{ return constant::value; }
 
 /*******************************************************
  *****   function<sin> template specialisations    *****
@@ -301,7 +305,7 @@ inline expr::ptr_type function<struct log>::derive(
 }
 
 template <> inline expr::string_type function<struct log>::to_string()
-{ return "log(" + n_ary::childs[0]->to_string() + ")"; };
+{ return "log(" + n_ary::childs[0]->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<struct log>::eval(const expr::valuation_type& val)
@@ -380,5 +384,7 @@ inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
 /*******************************************************
  *****   function<pow> template specialisations    *****
  *******************************************************/
+
+tree_type build(const std::string&);
 
 #endif
