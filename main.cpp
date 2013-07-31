@@ -3,6 +3,7 @@
 
 int main(int argc, char ** argv) {
 
+	using namespace ex;
 
     //tree_type t(new function<constant>(5));
     //auto d = std::move(t->derive(0));

@@ -9,6 +9,8 @@
 #include <type_traits>
 #include <cmath>
 
+namespace ex {
+
 /**
  * Virtual super-class for expression tree
  *
@@ -119,6 +121,37 @@ public:
 };
 
 /**
+ * Are same type trait
+ */
+template <typename... TList>
+struct are_same { constexpr static bool value = false; };
+
+template <typename T, typename... TList>
+struct are_same<T, T, TList...> {
+    constexpr static bool value = are_same<T, TList...>::value;
+};
+
+template <typename T>
+struct are_same<T> { constexpr static bool value = true; };
+
+template <>
+struct are_same<> { constexpr static bool value = true; };
+
+/**
+ * Generic array inserter
+ */
+template <class Array, class T>
+void move_to(Array& a, T && t) {
+	a[a.size() - 1] = std::move(t);
+}
+
+template <class Array, class T, class... TList>
+void move_to(Array& a, T && t, TList && ... plist) {
+	a[a.size() - sizeof...(plist) - 1] = std::move(t);
+	move_to(a, std::move(plist)...);
+}
+
+/**
  * Function class with all functionality
  * 
  * Template parameter must be derived from function_base class - this makes
@@ -126,6 +159,7 @@ public:
  * supplied.
  *
  * TODO : Conditionally derive from n_ary only when T::arity != 0
+ * TODO : Leverage generic design and make generic to_string and eval
  */
 template <class T, class Enable = void>
 class function;
@@ -159,6 +193,17 @@ public:
 	function(const typename U::value_type& value);
 
     function() {};
+
+	template<
+			typename... Tree, 
+			typename std::enable_if<
+					sizeof...(Tree) == T::arity && 
+					are_same<expr::ptr_type, Tree...>::value
+				>::type...
+		>
+	explicit function(Tree&&... tlist) 
+	{ move_to(n_ary<T::arity>::childs, std::move(tlist)...); };
+
     explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
 		for (std::size_t i = 0; i < T::arity; ++i)
 			n_ary<T::arity>::childs[i] = std::move(a.childs[i]->clone());
@@ -172,6 +217,15 @@ public:
 
 	virtual expr::string_type to_string();
 	virtual expr::eval_type eval(const expr::valuation_type& values);
+
+	operator expr::string_type() const 
+	{ return to_string(); }
+
+	operator expr::ptr_type() const
+	{ return ptr_type(this); };
+
+	expr::ptr_type& operator[] (std::size_t i)
+	{ return n_ary<T::arity>::childs[i]; }
 
 };
 
@@ -366,14 +420,16 @@ inline expr::eval_type function<add>::eval(const expr::valuation_type& val)
 template <>
 inline expr::ptr_type function<sub>::derive(
         const expr::valuation_type::size_type& var) {
-    auto *p = new function<sub>;
-    p->childs[0] = std::move(n_ary::childs[0]->derive(var));
-    p->childs[1] = std::move(n_ary::childs[1]->derive(var));
+    
+	auto *p = new function<sub>(
+		operator[](0)->derive(var),
+		operator[](1)->derive(var));
+
     return ptr_type(p);
 }
 
 template <> inline expr::string_type function<sub>::to_string()
-{ return n_ary::childs[0]->to_string() + "-" + n_ary::childs[1]->to_string(); }
+{ return operator[](0)->to_string() + "-" + operator[](1)->to_string(); }
 
 template <>
 inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
@@ -386,24 +442,26 @@ inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
 template <>
 inline expr::ptr_type function<mul>::derive(
         const expr::valuation_type::size_type& var) {
-    auto *add_lhs = new function<mul>;
-    add_lhs->childs[0] = std::move(n_ary::childs[0]->derive(var));
-    add_lhs->childs[1] = std::move(n_ary::childs[1]->clone());
-    auto *add_rhs = new function<mul>;
-    add_rhs->childs[0] = std::move(n_ary::childs[0]->clone());
-    add_rhs->childs[1] = std::move(n_ary::childs[1]->derive(var));
-    auto *res = new function<add>;
-    res->childs[0] = std::move(ptr_type(add_lhs));
-    res->childs[1] = std::move(ptr_type(add_rhs));
+
+    auto *add_lhs = new function<mul>(
+		operator[](0)->derive(var),
+		operator[](1)->clone());
+
+    auto *add_rhs = new function<mul>(
+		ptr_type(operator[](0)->clone()),
+		ptr_type(operator[](1)->derive(var)));
+
+	auto res = new function<add>(ptr_type(add_lhs), ptr_type(add_rhs));
+
     return ptr_type(res);
 }
 
 template <> inline expr::string_type function<mul>::to_string()
-{ return n_ary::childs[0]->to_string() + "*" + n_ary::childs[1]->to_string(); }
+{ return operator[](0)->to_string() + "*" + operator[](1)->to_string(); }
 
 template <>
 inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
-{ return n_ary::childs[0]->eval(val) * n_ary::childs[1]->eval(val); }
+{ return operator[](0)->eval(val) * operator[](1)->eval(val); }
 
 /*******************************************************
  *****   function<div> template specialisations    *****
@@ -478,5 +536,7 @@ inline expr::eval_type function<struct pow>::eval(const expr::valuation_type& va
 { return std::pow(childs[0]->eval(val), childs[1]->eval(val)); }
 
 tree_type build(const std::string&);
+
+} // end namespace ex
 
 #endif

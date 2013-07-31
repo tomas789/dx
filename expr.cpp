@@ -1,6 +1,9 @@
 #include "expr.hpp"
 
-tree_type build(const std::string& str) {
-	return tree_type(new function<constant>(4));
+ex::tree_type ex::build(const std::string& str) {
+	auto c = new function<constant>(5);
+	auto v = new function<variable>(0);
+	auto m = new function<struct mul>(tree_type(c), tree_type(v));
+	return tree_type(m);
 }
 
