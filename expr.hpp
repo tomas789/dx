@@ -291,6 +291,34 @@ inline expr::eval_type function<struct cos>::eval(
  *****   function<tan> template specialisations    *****
  *******************************************************/
 
+template <>
+inline expr::ptr_type function<struct tan>::derive(
+		const expr::valuation_type::size_type& var) {
+	auto n5 = new function<mul>;
+	n5->childs[0] = std::move(ptr_type(new function<constant>(2)));
+	n5->childs[1] = std::move(childs[0]->clone());
+	auto n4 = new function<struct cos>;
+	n4->childs[0] = std::move(ptr_type(n5));
+	auto n3 = new function<add>;
+	n3->childs[0] = std::move(ptr_type(n4));
+	n3->childs[1] = std::move(ptr_type(new function<constant>(1)));
+	auto n2 = new function<mul>;
+	n2->childs[0] = std::move(ptr_type(new function<constant>(2)));
+	n2->childs[1] = std::move(childs[0]->derive(var));
+	auto n1 = new function<struct div>;
+	n1->childs[0] = std::move(ptr_type(n2));
+	n1->childs[1] = std::move(ptr_type(n3));
+	return ptr_type(n1);
+}
+
+template <> inline expr::string_type function<struct tan>::to_string()
+{ return "tan(" + childs[0]->to_string() + ")"; }
+
+template <>
+inline expr::eval_type function<struct tan>::eval(
+		const expr::valuation_type& val)
+{ return std::tan(childs[0]->eval(val)); }
+
 /*******************************************************
  *****   function<log> template specialisations    *****
  *******************************************************/
@@ -381,9 +409,73 @@ inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
  *****   function<div> template specialisations    *****
  *******************************************************/
 
+template <>
+inline expr::ptr_type function<struct div>::derive(
+		const expr::valuation_type::size_type& var) {
+	auto n5 = new function<struct mul>;
+	n5->childs[0] = std::move(childs[0]->clone());
+	n5->childs[1] = std::move(childs[1]->derive(var));
+	auto n4 = new function<struct mul>;
+	n4->childs[0] = std::move(childs[1]->clone());
+	n4->childs[1] = std::move(childs[0]->derive(var));
+	auto n3 = new function<struct pow>;
+	n3->childs[0] = std::move(childs[1]->clone());
+	n3->childs[1] = std::move(ptr_type(new function<constant>(2)));
+	auto n2 = new function<struct sub>;
+	n2->childs[0] = std::move(ptr_type(n4));
+	n2->childs[1] = std::move(ptr_type(n5));
+	auto n1 = new function<struct div>;
+	n1->childs[0] = std::move(ptr_type(n2));
+	n1->childs[1] = std::move(ptr_type(n3));
+	return ptr_type(n1);
+}
+
+template <> inline expr::string_type function<struct div>::to_string()
+{ return childs[0]->to_string() + "/" + childs[1]->to_string(); }
+
+template <>
+inline expr::eval_type function<struct div>::eval(const expr::valuation_type& val)
+{ return childs[0]->eval(val) / childs[1]->eval(val); }
+
 /*******************************************************
  *****   function<pow> template specialisations    *****
  *******************************************************/
+
+template <>
+inline expr::ptr_type function<struct pow>::derive(
+		const expr::valuation_type::size_type& var) {
+	auto n8 = new function<struct log>;
+	n8->childs[0] = std::move(childs[0]->clone());
+	auto n7 = new function<struct mul>;
+	n7->childs[0] = std::move(ptr_type(n8));
+	n7->childs[1] = std::move(childs[1]->derive(var));
+	auto n6 = new function<struct mul>;
+	n6->childs[0] = std::move(childs[0]->derive(var));
+	n6->childs[1] = std::move(ptr_type(n7));
+	auto n5 = new function<struct mul>;
+	n5->childs[0] = std::move(childs[1]->clone());
+	n5->childs[1] = std::move(childs[0]->derive(var));
+	auto n4 = new function<struct sub>;
+	n4->childs[0] = std::move(childs[1]->clone());
+	n4->childs[1] = std::move(ptr_type(new function<constant>(1)));
+	auto n3 = new function<struct add>;
+	n3->childs[0] = std::move(ptr_type(n5));
+	n3->childs[1] = std::move(ptr_type(n6));
+	auto n2 = new function<struct pow>;
+	n2->childs[0] = std::move(childs[0]->clone());
+	n2->childs[1] = std::move(ptr_type(n4));
+	auto n1 = new function<struct mul>;
+	n1->childs[0] = std::move(ptr_type(n2));
+	n1->childs[1] = std::move(ptr_type(n3));
+	return ptr_type(n1);
+}
+
+template <> inline expr::string_type function<struct pow>::to_string()
+{ return childs[0]->to_string() + "^" + childs[1]->to_string(); }
+
+template <>
+inline expr::eval_type function<struct pow>::eval(const expr::valuation_type& val)
+{ return std::pow(childs[0]->eval(val), childs[1]->eval(val)); }
 
 tree_type build(const std::string&);
 
