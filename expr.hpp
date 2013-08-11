@@ -8,6 +8,7 @@
 #include <vector>
 #include <type_traits>
 #include <cmath>
+#include <typeinfo>
 
 namespace ex {
 
@@ -20,7 +21,7 @@ namespace ex {
 class expr {
 public:
 
-	/* It might be beter to use policy class instead */
+	/* It might be better to use policy class instead */
 	using ptr_type = std::unique_ptr<expr>;
 	using string_type = std::string;
 	using eval_type = double;
@@ -158,7 +159,7 @@ void move_to(Array& a, T && t, TList && ... plist) {
  * more human-readable compiler errors when invalid template parameter is
  * supplied.
  *
- * TODO : Conditionally derive from n_ary only when T::arity != 0
+ * TODO : Conditionally derive from n_ary only when T::arity != 0 (?)
  * TODO : Leverage generic design and make generic to_string and eval
  */
 template <class T, class Enable = void>
@@ -202,7 +203,7 @@ public:
 				>::type...
 		>
 	explicit function(Tree&&... tlist) 
-	{ move_to(n_ary<T::arity>::childs, std::move(tlist)...); };
+	{ move_to(n_ary<T::arity>::childs, std::move(tlist)...); }
 
     explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
 		for (std::size_t i = 0; i < T::arity; ++i)
@@ -227,6 +228,8 @@ public:
 	expr::ptr_type& operator[] (std::size_t i)
 	{ return n_ary<T::arity>::childs[i]; }
 
+	const std::type_info& type() const 
+	{ return typeid(*this); }
 };
 
 template <
@@ -407,7 +410,7 @@ inline expr::ptr_type function<add>::derive(
 }
 
 template <> inline expr::string_type function<add>::to_string()
-{ return n_ary::childs[0]->to_string() + "+" + n_ary::childs[1]->to_string(); }
+{ return "(" + n_ary::childs[0]->to_string() + "+" + n_ary::childs[1]->to_string() + ")"; }
 
 template <> 
 inline expr::eval_type function<add>::eval(const expr::valuation_type& val) 
@@ -429,7 +432,7 @@ inline expr::ptr_type function<sub>::derive(
 }
 
 template <> inline expr::string_type function<sub>::to_string()
-{ return operator[](0)->to_string() + "-" + operator[](1)->to_string(); }
+{ return "(" + operator[](0)->to_string() + "-" + operator[](1)->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
@@ -457,7 +460,7 @@ inline expr::ptr_type function<mul>::derive(
 }
 
 template <> inline expr::string_type function<mul>::to_string()
-{ return operator[](0)->to_string() + "*" + operator[](1)->to_string(); }
+{ return "(" + operator[](0)->to_string() + "*" + operator[](1)->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
@@ -489,7 +492,7 @@ inline expr::ptr_type function<struct div>::derive(
 }
 
 template <> inline expr::string_type function<struct div>::to_string()
-{ return childs[0]->to_string() + "/" + childs[1]->to_string(); }
+{ return "(" + childs[0]->to_string() + "/" + childs[1]->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<struct div>::eval(const expr::valuation_type& val)
@@ -536,6 +539,8 @@ inline expr::eval_type function<struct pow>::eval(const expr::valuation_type& va
 { return std::pow(childs[0]->eval(val), childs[1]->eval(val)); }
 
 tree_type build(const std::string&);
+
+
 
 } // end namespace ex
 

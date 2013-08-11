@@ -4,7 +4,6 @@
 #include <iostream>
 #include <typeinfo>
 #include "expr.hpp"
-#include "grammar.hpp"
 
 class expression {
 	ex::tree_type tree;

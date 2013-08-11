@@ -19,7 +19,7 @@ expression& expression::operator= (const expression& expr)
 { return *this = std::move(expression(expr)); }
 
 expression& expression::operator= (expression&& expr)
-{ tree = std::move(expr.tree); };
+{ tree = std::move(expr.tree); return *this; }
 
 bool expression::empty() const
 { return ! tree.get(); }
