@@ -23,6 +23,10 @@ tree_type & tree_type::operator= (tree_type && t) {
 	return *this;
 }
 
+bool tree_type::empty() const {
+    return !e_.get();
+}
+
 expr::size_type tree_type::arity() const { 
     return e_->arity();
 }

@@ -71,6 +71,7 @@ public:
     tree_type & operator= (const tree_type & t);
     tree_type & operator= (tree_type && t);
 
+    bool empty() const;
     expr::size_type arity() const;
     tree_type & operator[] (expr::size_type n);
     std::unique_ptr<expr> & operator-> ();
@@ -109,6 +110,17 @@ public:
 
     expr::ptr_type & operator[] (expr::size_type n) {
         return childs[n];
+    }
+
+    template <class T, class ... TList>
+    void move_to(T && t, TList && ... plist) {
+        childs[childs.size() - sizeof...(plist) - 1] = std::move(t);
+        move_to(std::move(plist)...);
+    }
+
+    template <class T>
+    void move_to(T && t) {
+        childs[childs.size() - 1] = std::move(t);
     }
 };
 
