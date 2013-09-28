@@ -10,13 +10,13 @@ exparser::return_type exparser::loop(const std::string& s) {
     
     if (debug) std::cout << "PARSING : " << s << std::endl;
 
-    if (debug) std::cerr << "Try constant" << std::endl;
-    return_type constant = parse_constant(s);
-    if (std::get<0>(constant)) return constant;
-    
     if (debug) std::cerr << "Try parenthesis" << std::endl;
     return_type parenthesis = parse_parenthesis(s);
     if (std::get<0>(parenthesis)) return parenthesis;
+    
+    if (debug) std::cerr << "Try constant" << std::endl;
+    return_type constant = parse_constant(s);
+    if (std::get<0>(constant)) return constant;
     
     if (debug) std::cerr << "Try variable" << std::endl;
     return_type variable = parse_variable(s);
@@ -82,7 +82,7 @@ exparser::return_type exparser::parse_variable(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_plus(const std::string& s) {
-    std::size_t par = 0;
+    int par = 0;
     for (std::size_t i = s.length() - 1; i > 0; --i) {
         if ('(' == s[i]) ++par;
         else if (')' == s[i]) --par;
@@ -101,7 +101,7 @@ exparser::return_type exparser::parse_plus(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_minus(const std::string& s) {
-    std::size_t par = 0;
+    int par = 0;
     for (std::size_t i = s.length() - 1; i > 0; --i) {
         if ('(' == s[i]) ++par;
         else if (')' == s[i]) --par;
@@ -120,7 +120,7 @@ exparser::return_type exparser::parse_minus(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_multiply(const std::string& s) {
-    std::size_t par = 0;
+    int par = 0;
     for (std::size_t i = s.length() - 1; i > 0; --i) {
         if ('(' == s[i]) ++par;
         else if (')' == s[i]) --par;
@@ -139,7 +139,7 @@ exparser::return_type exparser::parse_multiply(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_divide(const std::string& s) {
-    std::size_t par = 0;
+    int par = 0;
     for (std::size_t i = s.length() - 1; i > 0; --i) {
         if ('(' == s[i]) ++par;
         else if (')' == s[i]) --par;
@@ -158,7 +158,7 @@ exparser::return_type exparser::parse_divide(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_power(const std::string& s) {
-    std::size_t par = 0;
+    int par = 0;
     for (std::size_t i = 0; i < s.length(); ++i) {
         if ('(' == s[i]) ++par;
         else if (')' == s[i]) --par;
@@ -179,7 +179,7 @@ exparser::return_type exparser::parse_power(const std::string& s) {
 exparser::return_type exparser::parse_function(const std::string& s) {
     if (s[s.length() - 1] != ')') return return_false;
     std::size_t pos = s.find_first_of("(");
-    if (pos == std::string::npos) return return_false;
+    if (pos == std::string::npos || !pos) return return_false;
 
     auto inner = loop(s.substr(pos, std::string::npos));
     if (!std::get<0>(inner)) return return_false;
