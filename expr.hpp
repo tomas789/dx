@@ -130,27 +130,27 @@ public:
 struct function_base { };
 
 struct variable : public function_base { 
-	constexpr static std::size_t arity = 0;
+	static const std::size_t arity = 0;
     typedef expr::valuation_type::size_type value_type;
 	value_type value;
 };
 
 struct constant : public function_base { 
-	constexpr static std::size_t arity = 0; 
+	static const std::size_t arity = 0; 
     typedef expr::eval_type value_type;
 	value_type value;
 };
 
-struct sin : public function_base { constexpr static std::size_t arity = 1; };
-struct cos : public function_base { constexpr static std::size_t arity = 1; };
-struct tan : public function_base { constexpr static std::size_t arity = 1; };
-struct log : public function_base { constexpr static std::size_t arity = 1; };
+struct sin : public function_base { static const std::size_t arity = 1; };
+struct cos : public function_base { static const std::size_t arity = 1; };
+struct tan : public function_base { static const std::size_t arity = 1; };
+struct log : public function_base { static const std::size_t arity = 1; };
 
-struct add : public function_base { constexpr static std::size_t arity = 2; };
-struct sub : public function_base { constexpr static std::size_t arity = 2; };
-struct mul : public function_base { constexpr static std::size_t arity = 2; };
-struct div : public function_base { constexpr static std::size_t arity = 2; };
-struct pow : public function_base { constexpr static std::size_t arity = 2; };
+struct add : public function_base { static const std::size_t arity = 2; };
+struct sub : public function_base { static const std::size_t arity = 2; };
+struct mul : public function_base { static const std::size_t arity = 2; };
+struct div : public function_base { static const std::size_t arity = 2; };
+struct pow : public function_base { static const std::size_t arity = 2; };
 
 /**
  * Function class with all functionality
@@ -185,20 +185,31 @@ public:
 	 *        without additional encapsulation (pair, tuple, vector, ...)?
 	 * TODO : define template <class T> function<T>::operator std::string();
 	 */
+    
+    /**
+     * Parameterless constructor 
+     */
+    function() {
+    }
+
+    /**
+     * Construct using value
+     * Fro nullary functions only (T::arity == 0)
+     */
 	template <
             typename U = T, 
             typename std::enable_if<
                     has_value<U>::value
                 >::type ...
         >
-	function(const typename U::value_type& v) 
-    { U::value = v; }
+	function(const typename U::value_type& v) { 
+        U::value = v; 
+    }
 
-    function() {};
-
-	operator expr::ptr_type() const
-	{ return ptr_type(this); };
-
+    /**
+     * Initialize using childrens
+     * For non-terminals onyl (T::arity != 0)
+     */
 	template<
 			typename... Tree, 
 			typename std::enable_if<
@@ -206,31 +217,41 @@ public:
 					are_same<expr::ptr_type, Tree...>::value
 				>::type...
 		>
-	explicit function(Tree&&... tlist) 
-	{ move_to(n_ary<T::arity>::childs, std::move(tlist)...); }
+	explicit function(Tree && ... tlist) {
+        n_ary<T::arity>::move_to(std::move(tlist)...);
+    }
 
-    /* copy constructor */
+    /** 
+     * Copy constructor 
+     */
     explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
 		for (std::size_t i = 0; i < T::arity; ++i)
 			n_ary<T::arity>::childs[i] = std::move(a.childs[i]->clone());
 	};
 
-	expr::ptr_type derive(const expr::valuation_type::size_type& var);
-	
-	expr::ptr_type clone() {
-		return expr::ptr_type(new function<T>(*this));
-	};
+	/**
+     * Implicit type cast to tree_type
+     */
+    operator expr::ptr_type() const { 
+        return ptr_type(this); 
+    }
 
+    expr::ptr_type derive(const expr::valuation_type::size_type& var);
 	expr::string_type to_string();
 	expr::eval_type eval(const expr::valuation_type& values);
 
-	operator expr::string_type() const 
-	{ return to_string(); }
-
-	expr::ptr_type& operator[] (std::size_t i)
-	{ return n_ary<T::arity>::childs[i]; }
+    /**
+     * Virtual copy constructor using actual copy constructor
+     */
+    expr::ptr_type clone() {
+		return expr::ptr_type(new function<T>(*this));
+	}
 };
 
+/**
+ * Construct terminal functions by it's value
+ * TODO : NOT TESTED
+ */
 template <
         class T, 
         class = typename std::enable_if<
