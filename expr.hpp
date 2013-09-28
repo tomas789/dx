@@ -12,7 +12,6 @@
 #include <vector>
 #include <type_traits>
 #include <cmath>
-#include <typeinfo>
 
 #include "traits.hpp"
 
@@ -31,11 +30,11 @@ public:
 
 	/* It might be better to use policy class instead */
 	//using ptr_type = std::unique_ptr<expr>;
-	using ptr_type = tree_type;
-    using string_type = std::string;
-	using eval_type = double;
-	using valuation_type = std::vector<eval_type>;
-    using size_type = std::size_t;
+    typedef tree_type ptr_type;
+    typedef std::string string_type;
+    typedef double eval_type;
+    typedef std::vector<eval_type> valuation_type;
+    typedef std::size_t size_type;
 
 	virtual ptr_type derive(const valuation_type::size_type& var) = 0;
 	virtual ptr_type clone() = 0;
