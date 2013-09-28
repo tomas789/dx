@@ -2,15 +2,9 @@
 #define EXPRESSION_HPP
 
 #include <iostream>
-#include <typeinfo>
-#include "expr.hpp"
+#include <vector>
 
-namespace std {
-    template<
-            class T,
-            class Allocator
-        > class vector;
-}
+#include "expr.hpp"
 
 class expression {
 	ex::tree_type tree;
@@ -31,7 +25,7 @@ public:
     bool empty() const;
 	string_type to_string() const;
 	expression derive(const valuation_type::size_type&) const;
-    double evaluate(const std::vector<double>& v);
+    double evaluate(const std::vector<double> & v);
 
 	expression operator+ (const expression&) const;
 	expression operator- (const expression&) const;

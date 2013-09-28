@@ -19,6 +19,9 @@ namespace ex {
 
 class tree_type;
 
+template <class T, class Enable = void>
+class function;
+
 /**
  * Virtual super-class for expression tree
  *
@@ -112,15 +115,13 @@ public:
         return childs[n];
     }
 
+    void move_to() {
+    }
+
     template <class T, class ... TList>
     void move_to(T && t, TList && ... plist) {
         childs[childs.size() - sizeof...(plist) - 1] = std::move(t);
         move_to(std::move(plist)...);
-    }
-
-    template <class T>
-    void move_to(T && t) {
-        childs[childs.size() - 1] = std::move(t);
     }
 };
 
@@ -162,8 +163,8 @@ struct pow : public function_base { static const std::size_t arity = 2; };
  * TODO : Conditionally derive from n_ary only when T::arity != 0 (?)
  * TODO : Leverage generic design and make generic to_string and eval
  */
-template <class T, class Enable = void>
-class function;
+//template <class T, class Enable = void>
+//class function;
 
 template <class T>
 class function<
@@ -208,14 +209,14 @@ public:
 
     /**
      * Initialize using childrens
-     * For non-terminals onyl (T::arity != 0)
+     * For non-terminals only (T::arity != 0)
      */
 	template<
 			typename... Tree, 
-			typename std::enable_if<
+			typename = typename std::enable_if<
 					sizeof...(Tree) == T::arity && 
 					are_same<expr::ptr_type, Tree...>::value
-				>::type...
+				>::type
 		>
 	explicit function(Tree && ... tlist) {
         n_ary<T::arity>::move_to(std::move(tlist)...);
