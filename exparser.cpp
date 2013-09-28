@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "exparser.hpp"
 
 const exparser::return_type exparser::return_false = 

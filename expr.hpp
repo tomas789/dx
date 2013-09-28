@@ -63,7 +63,7 @@ public:
 class tree_type {
     std::unique_ptr<expr> e_;
 public:
-	constexpr tree_type() = default;
+	tree_type() = default;
     explicit tree_type(expr * p);
     tree_type(tree_type && t);
     tree_type(const tree_type & t);

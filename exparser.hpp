@@ -8,9 +8,9 @@
 
 class exparser {
 public:
-    using return_type = std::tuple<bool, expression>;
+    typedef std::tuple<bool, expression> return_type;
 
-    const bool debug = false;
+    static const bool debug = false;
 
 private:
     static const return_type return_false;

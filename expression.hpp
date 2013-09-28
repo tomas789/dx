@@ -16,8 +16,8 @@ class expression {
 	ex::tree_type tree;
 
 public:
-	using string_type = ex::expr::string_type;
-	using valuation_type = ex::expr::valuation_type;
+	typedef ex::expr::string_type string_type;
+	typedef ex::expr::valuation_type valuation_type;
 
 	expression();
 	expression(const expression&);
