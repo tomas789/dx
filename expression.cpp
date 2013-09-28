@@ -21,9 +21,6 @@ expression& expression::operator= (const expression& expr)
 expression& expression::operator= (expression&& expr)
 { tree = std::move(expr.tree); return *this; }
 
-bool expression::empty() const
-{ return ! tree.get(); }
-
 expression::string_type expression::to_string() const {
 	if (! empty()) return tree->to_string();
 	return string_type();

@@ -28,7 +28,6 @@ public:
 	expression& operator= (const expression&);
 	expression& operator= (expression&&);
 
-	bool empty() const;
 	string_type to_string() const;
 	expression derive(const valuation_type::size_type&) const;
     double evaluate(const std::vector<double>& v);
