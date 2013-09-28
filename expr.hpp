@@ -60,7 +60,8 @@ public:
  * TODO : Instead of inheriting unique_ptr consider using it as 
  *        member variable
  */
-class tree_type : public std::unique_ptr<expr> {
+class tree_type {
+    std::unique_ptr<expr> e_;
 public:
 	constexpr tree_type() = default;
     explicit tree_type(expr * p);
@@ -72,6 +73,8 @@ public:
 
     expr::size_type arity() const;
     tree_type & operator[] (expr::size_type n);
+    std::unique_ptr<expr> & operator-> ();
+    const std::unique_ptr<expr> & operator-> () const;
     
 	/* no destructor required */
 };

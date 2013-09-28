@@ -2,29 +2,41 @@
 
 namespace ex {
 	
-tree_type::tree_type(expr * p) 
-  : std::unique_ptr<expr>(p) { }
+tree_type::tree_type(expr * p) : e_(p) { 
+}
 
-tree_type::tree_type(tree_type && t)
-{ operator= (std::move(t)); }
+tree_type::tree_type(tree_type && t) { 
+    *this = std::move(t); 
+}
 
-tree_type::tree_type(const tree_type & t)
-{ operator= (std::move(t->clone())); }
+tree_type::tree_type(const tree_type & t) {
+    *this = t;
+}
 
 tree_type & tree_type::operator= (const tree_type & t) {
-	std::unique_ptr<expr>::operator= (std::move(t->clone()));
+	e_ = std::move(t.e_->clone().e_);
 	return *this;
 }
 
 tree_type & tree_type::operator= (tree_type && t) {
-	std::unique_ptr<expr>::operator= (std::move(t));
+	e_ = (std::move(t.e_));
 	return *this;
 }
 
-expr::size_type tree_type::arity() const
-{ return operator-> ()->arity(); }
+expr::size_type tree_type::arity() const { 
+    return e_->arity();
+}
 
-tree_type & tree_type::operator[] (expr::size_type n)
-{ return operator-> ()->operator[] (n); }
+tree_type & tree_type::operator[] (expr::size_type n) { 
+    return e_->operator[] (n);
+}
+
+std::unique_ptr<expr> & tree_type::operator-> () {
+    return e_;
+}
+
+const std::unique_ptr<expr> & tree_type::operator-> () const {
+    return e_;
+}
 
 } // end namespace ex
