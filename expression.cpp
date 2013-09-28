@@ -4,7 +4,7 @@ expression::expression()
   : tree() { }
 
 expression::expression(const expression& expr)
-  : tree(expr.empty() ? NULL : std::move(expr.tree->clone())) { }
+  : tree(expr.empty() ? ex::tree_type() : std::move(expr.tree->clone())) { }
 
 expression::expression(expression&& expr)
   : tree(std::move(expr.tree)) { }
@@ -34,7 +34,11 @@ expression expression::derive(const valuation_type::size_type& val) const {
 	return expression();
 }
 
-expression expression::operator+ (const expression& expr) {
+double expression::evaluate(const std::vector<double>& v) {
+    return tree->eval(v);
+}
+
+expression expression::operator+ (const expression& expr) const {
 	return ex::tree_type(
 		new ex::function<ex::add>(
 			std::move(tree->clone()), 
@@ -43,7 +47,7 @@ expression expression::operator+ (const expression& expr) {
 	);
 }
 
-expression expression::operator- (const expression& expr) {
+expression expression::operator- (const expression& expr) const {
 	return ex::tree_type(
 		new ex::function<ex::sub>(
 			std::move(tree->clone()), 
@@ -52,7 +56,7 @@ expression expression::operator- (const expression& expr) {
 	);
 }
 
-expression expression::operator* (const expression& expr) {
+expression expression::operator* (const expression& expr) const {
 	return ex::tree_type(
 		new ex::function<ex::mul>(
 			std::move(tree->clone()), 
@@ -61,7 +65,7 @@ expression expression::operator* (const expression& expr) {
 	);
 }
 
-expression expression::operator/ (const expression& expr) {
+expression expression::operator/ (const expression& expr) const {
 	return ex::tree_type(
 		new ex::function<ex::div>(
 			std::move(tree->clone()), 
@@ -70,7 +74,7 @@ expression expression::operator/ (const expression& expr) {
 	);
 }
 
-expression expression::operator^ (const expression& expr) {
+expression expression::operator^ (const expression& expr) const {
 	return ex::tree_type(
 		new ex::function<ex::pow>(
 			std::move(tree->clone()), 
@@ -80,7 +84,7 @@ expression expression::operator^ (const expression& expr) {
 }
 
 std::ostream& operator<< (std::ostream& out, const expression& expr) {
-	return out << expr.to_string();
+	return out << expr.tree->to_string();
 }
 
 expression make_constant(double c) {
@@ -90,3 +94,16 @@ expression make_constant(double c) {
 expression make_variable(std::size_t v) {
 	return ex::tree_type(new ex::function<ex::variable>(v));
 }
+
+expression sin(const expression& e) {
+    return ex::tree_type(new ex::function<ex::sin>(std::move(e.tree->clone())));
+}
+
+expression cos(const expression& e) {
+    return ex::tree_type(new ex::function<ex::cos>(std::move(e.tree->clone())));
+}
+
+expression tan(const expression& e) {
+    return ex::tree_type(new ex::function<ex::tan>(std::move(e.tree->clone())));
+}
+

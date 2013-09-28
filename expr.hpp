@@ -1,6 +1,10 @@
 #ifndef EXPR_HPP
 #define EXPR_HPP
 
+/*
+ * BIG TODO : Check exception safety and add exception specifications
+ */
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -10,7 +14,11 @@
 #include <cmath>
 #include <typeinfo>
 
+#include "traits.hpp"
+
 namespace ex {
+
+class tree_type;
 
 /**
  * Virtual super-class for expression tree
@@ -22,15 +30,20 @@ class expr {
 public:
 
 	/* It might be better to use policy class instead */
-	using ptr_type = std::unique_ptr<expr>;
-	using string_type = std::string;
+	//using ptr_type = std::unique_ptr<expr>;
+	using ptr_type = tree_type;
+    using string_type = std::string;
 	using eval_type = double;
 	using valuation_type = std::vector<eval_type>;
+    using size_type = std::size_t;
 
 	virtual ptr_type derive(const valuation_type::size_type& var) = 0;
 	virtual ptr_type clone() = 0;
 	virtual string_type to_string() = 0;
 	virtual eval_type eval(const valuation_type& values) = 0;
+    
+    virtual size_type arity() = 0;
+    virtual ptr_type & operator[] (size_type n) = 0;
 };
 
 /**
@@ -44,8 +57,25 @@ public:
  * The class satisfies the requirements of MoveConstructible and 
  * MoveAssignable, but not the requirements of either 
  * CopyConstructible or CopyAssignable.
+ *
+ * TODO : Instead of inheriting unique_ptr consider using it as 
+ *        member variable
  */
-using tree_type = std::unique_ptr<expr>;
+class tree_type : public std::unique_ptr<expr> {
+public:
+	constexpr tree_type() = default;
+    explicit tree_type(expr * p);
+    tree_type(tree_type && t);
+    tree_type(const tree_type & t);
+
+    tree_type & operator= (const tree_type & t);
+    tree_type & operator= (tree_type && t);
+
+    expr::size_type arity() const;
+    tree_type & operator[] (expr::size_type n);
+    
+	/* no destructor required */
+};
 
 /**
  * Child (subtree) container.
@@ -69,9 +99,15 @@ template <std::size_t Arity>
 class n_ary : public expr {
 protected:
 	std::array<expr::ptr_type, Arity> childs;
-
     template <class T, class U> friend class function;
-    friend tree_type build(const std::string& str);
+public:
+    expr::size_type arity() {
+        return Arity;
+    }
+
+    expr::ptr_type & operator[] (expr::size_type n) {
+        return childs[n];
+    }
 };
 
 /**
@@ -101,56 +137,6 @@ struct sub : public function_base { constexpr static std::size_t arity = 2; };
 struct mul : public function_base { constexpr static std::size_t arity = 2; };
 struct div : public function_base { constexpr static std::size_t arity = 2; };
 struct pow : public function_base { constexpr static std::size_t arity = 2; };
-
-/**
- * Compile time type property deduction
- * Specialisation for specific templates should be sufficient but this is
- * more elegant and general
- */
-template <typename T>
-class has_value {
-    typedef char yes[1];
-    typedef char no[2];
-
-    template <typename U>
-    static yes& test(typename U::value_type*);
-    template <typename U>
-    static no& test(...);
-
-public:
-    enum { value = (sizeof(yes) == sizeof(test<T>(0))) };
-};
-
-/**
- * Are same type trait
- */
-template <typename... TList>
-struct are_same { constexpr static bool value = false; };
-
-template <typename T, typename... TList>
-struct are_same<T, T, TList...> {
-    constexpr static bool value = are_same<T, TList...>::value;
-};
-
-template <typename T>
-struct are_same<T> { constexpr static bool value = true; };
-
-template <>
-struct are_same<> { constexpr static bool value = true; };
-
-/**
- * Generic array inserter
- */
-template <class Array, class T>
-void move_to(Array& a, T && t) {
-	a[a.size() - 1] = std::move(t);
-}
-
-template <class Array, class T, class... TList>
-void move_to(Array& a, T && t, TList && ... plist) {
-	a[a.size() - sizeof...(plist) - 1] = std::move(t);
-	move_to(a, std::move(plist)...);
-}
 
 /**
  * Function class with all functionality
@@ -191,9 +177,13 @@ public:
                     has_value<U>::value
                 >::type ...
         >
-	function(const typename U::value_type& value);
+	function(const typename U::value_type& v) 
+    { U::value = v; }
 
     function() {};
+
+	operator expr::ptr_type() const
+	{ return ptr_type(this); };
 
 	template<
 			typename... Tree, 
@@ -205,31 +195,26 @@ public:
 	explicit function(Tree&&... tlist) 
 	{ move_to(n_ary<T::arity>::childs, std::move(tlist)...); }
 
+    /* copy constructor */
     explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
 		for (std::size_t i = 0; i < T::arity; ++i)
 			n_ary<T::arity>::childs[i] = std::move(a.childs[i]->clone());
 	};
 
-	virtual expr::ptr_type derive(const expr::valuation_type::size_type& var);
+	expr::ptr_type derive(const expr::valuation_type::size_type& var);
 	
-	virtual expr::ptr_type clone() {
+	expr::ptr_type clone() {
 		return expr::ptr_type(new function<T>(*this));
 	};
 
-	virtual expr::string_type to_string();
-	virtual expr::eval_type eval(const expr::valuation_type& values);
+	expr::string_type to_string();
+	expr::eval_type eval(const expr::valuation_type& values);
 
 	operator expr::string_type() const 
 	{ return to_string(); }
 
-	operator expr::ptr_type() const
-	{ return ptr_type(this); };
-
 	expr::ptr_type& operator[] (std::size_t i)
 	{ return n_ary<T::arity>::childs[i]; }
-
-	const std::type_info& type() const 
-	{ return typeid(*this); }
 };
 
 template <
@@ -248,8 +233,8 @@ expr::ptr_type construct(typename T::value_type v) {
 /**
  * Required prototypes
  */
-template <> template <> 
-inline function<constant>::function(const constant::value_type& val);
+//template <> template <> 
+//inline function<constant>::function(const constant::value_type& val);
 
 //template <> template <>
 //inline function<variable>::function(const variable::value_type& val);
@@ -258,9 +243,9 @@ inline function<constant>::function(const constant::value_type& val);
  ***** function<variable> template specialisations *****
  *******************************************************/
 
-template <> template <> 
-inline function<variable>::function(const variable::value_type& vnum)
-{ variable::value = vnum; }
+//template <> template <> 
+//inline function<variable>::function(const variable::value_type& vnum)
+//{ variable::value = vnum; }
 
 template <> 
 inline expr::ptr_type function<variable>::derive(
@@ -279,9 +264,9 @@ inline expr::eval_type function<variable>::eval(
  ***** function<constant> template specialisations *****
  *******************************************************/
 
-template <> template <> 
-inline function<constant>::function(const constant::value_type& val)
-{ constant::value = val; }
+//template <> template <> 
+//inline function<constant>::function(const constant::value_type& val)
+//{ constant::value = val; }
 
 template <> 
 inline expr::ptr_type function<constant>::derive(
@@ -532,15 +517,14 @@ inline expr::ptr_type function<struct pow>::derive(
 }
 
 template <> inline expr::string_type function<struct pow>::to_string()
-{ return childs[0]->to_string() + "^" + childs[1]->to_string(); }
+{ return "(" + childs[0]->to_string() + "^" + childs[1]->to_string() + ")"; }
 
 template <>
 inline expr::eval_type function<struct pow>::eval(const expr::valuation_type& val)
 { return std::pow(childs[0]->eval(val), childs[1]->eval(val)); }
 
-tree_type build(const std::string&);
-
-
+tree_type make_variable(variable::value_type vnum);
+tree_type make_constant(constant::value_type c);
 
 } // end namespace ex
 
