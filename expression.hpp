@@ -7,38 +7,38 @@
 #include "expr.hpp"
 
 class expression {
-	ex::tree_type tree;
+    ex::tree_type tree;
 
 public:
-	typedef ex::expr::string_type string_type;
-	typedef ex::expr::valuation_type valuation_type;
+    typedef ex::expr::string_type string_type;
+    typedef ex::expr::valuation_type valuation_type;
 
-	expression();
-	expression(const expression&);
-	expression(expression&&);
-	expression(ex::tree_type&&);
-	expression(double c);
+    expression();
+    expression(const expression&);
+    expression(expression&&);
+    expression(ex::tree_type&&);
+    expression(double c);
 
-	expression& operator= (const expression&);
-	expression& operator= (expression&&);
+    expression& operator= (const expression&);
+    expression& operator= (expression&&);
 
     bool empty() const;
-	string_type to_string() const;
-	expression derive(const valuation_type::size_type&) const;
+    string_type to_string() const;
+    expression derive(const string_type &) const;
     double evaluate(const std::vector<double> & v);
 
-	expression operator+ (const expression&) const;
-	expression operator- (const expression&) const;
-	expression operator* (const expression&) const;
-	expression operator/ (const expression&) const;
+    expression operator+ (const expression&) const;
+    expression operator- (const expression&) const;
+    expression operator* (const expression&) const;
+    expression operator/ (const expression&) const;
 
-	/**
-	 * TODO : Remove operator^. Overload pow function instead.
-	 *        reason is operator priority
-	 */
-	expression operator^ (const expression&) const;
+    /**
+     * TODO : Remove operator^. Overload pow function instead.
+     *        reason is operator priority
+     */
+    expression operator^ (const expression&) const;
 
-	friend std::ostream& operator<< (std::ostream&, const expression&);
+    friend std::ostream& operator<< (std::ostream&, const expression&);
     friend expression sin(const expression& e);
     friend expression cos(const expression& e);
     friend expression tan(const expression& e);

@@ -1,7 +1,7 @@
 #include "expr.hpp"
 
 namespace ex {
-	
+    
 tree_type::tree_type(expr * p) : e_(p) { 
 }
 
@@ -14,13 +14,13 @@ tree_type::tree_type(const tree_type & t) {
 }
 
 tree_type & tree_type::operator= (const tree_type & t) {
-	e_ = std::move(t.e_->clone().e_);
-	return *this;
+    e_ = std::move(t.e_->clone().e_);
+    return *this;
 }
 
 tree_type & tree_type::operator= (tree_type && t) {
-	e_ = (std::move(t.e_));
-	return *this;
+    e_ = (std::move(t.e_));
+    return *this;
 }
 
 bool tree_type::empty() const {
