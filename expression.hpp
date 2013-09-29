@@ -25,7 +25,7 @@ public:
     bool empty() const;
     string_type to_string() const;
     expression derive(const string_type &) const;
-    double evaluate(const std::vector<double> & v);
+    double evaluate(const valuation_type & v);
 
     expression operator+ (const expression&) const;
     expression operator- (const expression&) const;
@@ -48,7 +48,7 @@ public:
 std::ostream& operator<< (std::ostream&, const expression&);
 
 expression make_constant(double c);
-expression make_variable(std::size_t v);
+expression make_variable(const std::string & v);
 expression sin(const expression& e);
 expression cos(const expression& e);
 expression tan(const expression& e);

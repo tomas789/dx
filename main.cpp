@@ -1,9 +1,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "expression.hpp"
 #include "exparser.hpp"
+
+std::map<std::string, double> val_cache;
+
+double eval(const std::string & var_name);
 
 int main(int argc, char ** argv) {
     (std::cout << "Type expression : ").flush();
@@ -13,15 +18,28 @@ int main(int argc, char ** argv) {
     exparser p;
     try {
         expression e = p.parse(r);
-        std::vector<double> val = { 1, 2 };
+        auto c = e.evaluate(eval);
 
         std::cout << "INPUT : " << e << std::endl
-                  << "DERIVED BY x_0 : " << e.derive("x_0") << std::endl
-                  << "EVALUATED FOR x_0 = 1, x_1 = 2 : " << e.evaluate(val) << std::endl
-                  << "EVALUATED DERIVATION : " << e.derive(0).evaluate(val) << std::endl;
+                  << "DERIVED BY x : " << e.derive("x") << std::endl
+                  << "EVALUATED : " << c << std::endl
+                  << "EVALUATED DERIVATION BY x : " << e.derive("x").evaluate(eval) << std::endl;
     } catch (std::string e) {
         std::cerr << "EXCEPTION: " << e << std::endl;
     }
 
     return 0;
+}
+
+double eval(const std::string & var_name) {
+    auto it = val_cache.find(var_name);
+    if (it != val_cache.end()) return it->second;
+    
+    std::cout << " -=- ENTER VALUE FOR " << var_name << " : ";
+    std::cout.flush();
+
+    double c;
+    std::cin >> c;
+    
+    return val_cache[var_name] = c;
 }

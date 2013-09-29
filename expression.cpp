@@ -36,7 +36,7 @@ expression expression::derive(const string_type& val) const {
     return expression();
 }
 
-double expression::evaluate(const std::vector<double>& v) {
+double expression::evaluate(const valuation_type & v) {
     return tree->eval(v);
 }
 
@@ -93,8 +93,8 @@ expression make_constant(double c) {
     return ex::tree_type(new ex::function<ex::constant>(c));
 }
 
-expression make_variable(std::size_t v) {
-    return ex::tree_type(new ex::function<ex::variable>(v));
+expression make_variable(const std::string & var) {
+    return ex::tree_type(new ex::function<ex::variable>(var));
 }
 
 expression sin(const expression& e) {

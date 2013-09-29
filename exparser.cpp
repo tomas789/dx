@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <cctype>
 
 #include "exparser.hpp"
 
@@ -70,15 +71,12 @@ exparser::return_type exparser::parse_constant(const std::string& s) {
 }
 
 exparser::return_type exparser::parse_variable(const std::string& s) {
-    if ("x_" != s.substr(0, 2)) return return_false;
+    if (!isalpha(s[0])) return return_false;
 
-    std::size_t pos = 0;
-    auto num = stoul(s.substr(2, std::string::npos), &pos);
+    auto it = std::find_if_not(s.begin(), s.end(), isalnum);
+    if (it != s.end()) return return_false;
 
-    if (pos + 2 == s.length())
-        return return_type(true, make_variable(num));
-    else
-        return return_false;
+    return return_type(true, make_variable(s));
 }
 
 exparser::return_type exparser::parse_plus(const std::string& s) {
