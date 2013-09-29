@@ -18,6 +18,10 @@
 # Binaries
 a.out
 
+# OS X
+.DS_Store
+
 # Others
 *.bkp
 *.old
+*.gch
