@@ -20,12 +20,9 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $(EXECUTABLE)
 
 %.d: $(SOURCES)
-	$(CXX) $(CXXFLAGS) -MM $?
+	$(CXX) $(CXXFLAGS) -MM $? > $@
 
 -include ${SOURCES:.cpp=.d}
 
 # .cpp.o:
 # 	$(CXX) $(CXXFLAGS) -c $<
-
-.PHONY: all 
-.PHONY: clean
