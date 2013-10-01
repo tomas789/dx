@@ -1,6 +1,7 @@
 #include "expression.hpp"
 
 #include "expr.hpp"
+#include "n_ary.hpp"
 
 expression::expression()
   : tree() { }

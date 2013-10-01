@@ -1,3 +1,6 @@
+#ifndef TRAITS_HPP
+#define TRAITS_HPP
+
 #include <array>
 
 /**
@@ -50,3 +53,4 @@ void move_to(Array& a, T && t, TList && ... plist) {
     move_to(a, std::move(plist)...);
 }
 
+#endif

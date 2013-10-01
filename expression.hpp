@@ -5,9 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace ex {
-    class expr;
-}
+#include "expr.hpp"
 
 class expression {
     std::unique_ptr<ex::expr> tree;

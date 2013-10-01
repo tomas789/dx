@@ -5,20 +5,13 @@
  * BIG TODO : Check exception safety and add exception specifications
  */
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <array>
-#include <vector>
-#include <type_traits>
-#include <cmath>
+#include <functional>
 
 #include "traits.hpp"
-#include "expression.hpp"
+
+class expression;
 
 namespace ex {
-
-class tree_type;
 
 template <class T, class Enable = void>
 class function;
