@@ -49,6 +49,14 @@ double expression::evaluate(const valuation_type & v) {
     return tree->eval(v);
 }
 
+std::unique_ptr<ex::expr> & expression::operator-> () {
+    return tree;
+}
+
+const std::unique_ptr<ex::expr> & expression::operator-> () const {
+    return tree;
+}
+
 expression expression::operator+ (const expression& expr) const {
     return expression(
         new ex::function<ex::add>(

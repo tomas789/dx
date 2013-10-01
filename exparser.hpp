@@ -25,6 +25,9 @@ private:
     return_type parse_divide(const std::string& s);
     return_type parse_power(const std::string& s);
     return_type parse_function(const std::string& s);
+
+    static bool isalnum(char c);
+    static bool isalpha(char c);
 public:
     expression parse(const std::string& s);
 };

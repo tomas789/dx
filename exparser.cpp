@@ -1,5 +1,4 @@
 #include <stdexcept>
-#include <cctype>
 #include <algorithm>
 
 #include "exparser.hpp"
@@ -190,6 +189,14 @@ exparser::return_type exparser::parse_function(const std::string& s) {
     else if (s.substr(0, pos) == "tan") 
         return return_type(true, tan(std::get<1>(inner)));
     else return return_false;
+}
+
+bool exparser::isalpha(char c) {
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+}
+
+bool exparser::isalnum(char c) {
+    return ('0' <= c && c <= '9') || isalpha(c);
 }
 
 expression exparser::parse(const std::string& s) {
