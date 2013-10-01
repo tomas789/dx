@@ -3,34 +3,44 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
-#include "expr.hpp"
+namespace ex {
+    class expr;
+}
 
 class expression {
-    ex::tree_type tree;
+    std::unique_ptr<ex::expr> tree;
 
 public:
-    typedef ex::expr::string_type string_type;
-    typedef ex::expr::valuation_type valuation_type;
+    typedef std::size_t size_type;
+    typedef std::string string_type;
+    typedef double eval_type;
+    typedef std::function<eval_type(string_type)> valuation_type;
 
     expression();
-    expression(const expression&);
-    expression(expression&&);
-    expression(ex::tree_type&&);
-    expression(double c);
+    expression(const expression &);
+    expression(expression &&);
+    explicit expression(ex::expr * e);
+    expression(std::unique_ptr<ex::expr> &&);
 
-    expression& operator= (const expression&);
-    expression& operator= (expression&&);
+    expression& operator= (const expression &);
+    expression& operator= (expression &&);
 
     bool empty() const;
+    size_type arity() const;
+    expression & operator[] (size_type n);
     string_type to_string() const;
     expression derive(const string_type &) const;
-    double evaluate(const valuation_type & v);
+    eval_type evaluate(const valuation_type & v);
 
-    expression operator+ (const expression&) const;
-    expression operator- (const expression&) const;
-    expression operator* (const expression&) const;
-    expression operator/ (const expression&) const;
+    std::unique_ptr<ex::expr> & operator-> ();
+    const std::unique_ptr<ex::expr> & operator-> () const;
+
+    expression operator+ (const expression &) const;
+    expression operator- (const expression &) const;
+    expression operator* (const expression &) const;
+    expression operator/ (const expression &) const;
 
     /**
      * TODO : Remove operator^. Overload pow function instead.
@@ -38,20 +48,20 @@ public:
      */
     expression operator^ (const expression&) const;
 
-    friend std::ostream& operator<< (std::ostream&, const expression&);
-    friend expression sin(const expression& e);
-    friend expression cos(const expression& e);
-    friend expression tan(const expression& e);
-    friend expression log(const expression& e);
+    friend std::ostream& operator<< (std::ostream &, const expression &);
+    friend expression sin(const expression & e);
+    friend expression cos(const expression & e);
+    friend expression tan(const expression & e);
+    friend expression log(const expression & e);
 };
 
-std::ostream& operator<< (std::ostream&, const expression&);
+std::ostream& operator<< (std::ostream &, const expression &);
 
 expression make_constant(double c);
 expression make_variable(const std::string & v);
-expression sin(const expression& e);
-expression cos(const expression& e);
-expression tan(const expression& e);
-expression log(const expression& e);
+expression sin(const expression & e);
+expression cos(const expression & e);
+expression tan(const expression & e);
+expression log(const expression & e);
 
 #endif

@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <cctype>
+#include <algorithm>
 
 #include "exparser.hpp"
 
