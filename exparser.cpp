@@ -165,7 +165,7 @@ exparser::return_type exparser::parse_power(const std::string& s) {
             auto rhs = loop(s.substr(i+1, std::string::npos));
 
             if (std::get<0>(lhs) && std::get<0>(rhs))
-                return return_type(true, std::get<1>(lhs) ^ std::get<1>(rhs));
+                return return_type(true, pow(std::get<1>(lhs), std::get<1>(rhs)));
             else
                 return return_false;
         }

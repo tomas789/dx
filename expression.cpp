@@ -1,5 +1,6 @@
 #include "expression.hpp"
 
+#include "exparser.hpp"
 #include "expr.hpp"
 #include "n_ary.hpp"
 
@@ -60,7 +61,7 @@ const std::unique_ptr<ex::expr> & expression::operator-> () const {
 
 expression expression::operator+ (const expression& expr) const {
     return expression(
-        new ex::function<ex::add>(
+        new ex::function<ex::base::add>(
             std::move(tree->clone()), 
             std::move(expr.tree->clone())
         )
@@ -69,7 +70,7 @@ expression expression::operator+ (const expression& expr) const {
 
 expression expression::operator- (const expression& expr) const {
     return expression(
-        new ex::function<ex::sub>(
+        new ex::function<ex::base::sub>(
             std::move(tree->clone()), 
             std::move(expr.tree->clone())
         )
@@ -78,7 +79,7 @@ expression expression::operator- (const expression& expr) const {
 
 expression expression::operator* (const expression& expr) const {
     return expression(
-        new ex::function<ex::mul>(
+        new ex::function<ex::base::mul>(
             std::move(tree->clone()), 
             std::move(expr.tree->clone())
         )
@@ -87,20 +88,16 @@ expression expression::operator* (const expression& expr) const {
 
 expression expression::operator/ (const expression& expr) const {
     return expression(
-        new ex::function<ex::div>(
+        new ex::function<ex::base::div>(
             std::move(tree->clone()), 
             std::move(expr.tree->clone())
         )
     );
 }
 
-expression expression::operator^ (const expression& expr) const {
-    return expression(
-        new ex::function<ex::pow>(
-            std::move(tree->clone()), 
-            std::move(expr.tree->clone())
-        )
-    );
+expression parse(const std::string & s) {
+    exparser p;
+    return p.parse(s);
 }
 
 std::ostream& operator<< (std::ostream& out, const expression& expr) {
@@ -108,22 +105,30 @@ std::ostream& operator<< (std::ostream& out, const expression& expr) {
 }
 
 expression make_constant(double c) {
-    return expression(new ex::function<ex::constant>(c));
+    return expression(new ex::function<ex::base::constant>(c));
 }
 
 expression make_variable(const std::string & var) {
-    return expression(new ex::function<ex::variable>(var));
+    return expression(new ex::function<ex::base::variable>(var));
 }
 
 expression sin(const expression& e) {
-    return expression(new ex::function<ex::sin>(std::move(e.tree->clone())));
+    return expression(new ex::function<ex::base::sin>(std::move(e.tree->clone())));
 }
 
 expression cos(const expression& e) {
-    return expression(new ex::function<ex::cos>(std::move(e.tree->clone())));
+    return expression(new ex::function<ex::base::cos>(std::move(e.tree->clone())));
 }
 
 expression tan(const expression& e) {
-    return expression(new ex::function<ex::tan>(std::move(e.tree->clone())));
+    return expression(new ex::function<ex::base::tan>(std::move(e.tree->clone())));
+}
+
+expression log(const expression & e) {
+    return expression(new ex::function<ex::base::log>(std::move(e.tree->clone())));
+}
+
+expression pow(const expression & base, const expression & exp) {
+    return expression(new ex::function<ex::base::pow>(base.tree->clone(), exp.tree->clone()));
 }
 

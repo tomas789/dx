@@ -40,18 +40,15 @@ public:
     expression operator* (const expression &) const;
     expression operator/ (const expression &) const;
 
-    /**
-     * TODO : Remove operator^. Overload pow function instead.
-     *        reason is operator priority
-     */
-    expression operator^ (const expression&) const;
-
     friend std::ostream& operator<< (std::ostream &, const expression &);
     friend expression sin(const expression & e);
     friend expression cos(const expression & e);
     friend expression tan(const expression & e);
     friend expression log(const expression & e);
+    friend expression pow(const expression & base, const expression & exp);
 };
+
+expression parse(const std::string & s);
 
 std::ostream& operator<< (std::ostream &, const expression &);
 
@@ -61,5 +58,6 @@ expression sin(const expression & e);
 expression cos(const expression & e);
 expression tan(const expression & e);
 expression log(const expression & e);
+expression pow(const expression & base, const expression & exp);
 
 #endif

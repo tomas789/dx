@@ -4,7 +4,6 @@
 #include <map>
 
 #include "expression.hpp"
-#include "exparser.hpp"
 
 std::map<std::string, double> val_cache;
 
@@ -15,9 +14,8 @@ int main(int argc, char ** argv) {
     std::string r;
     std::getline(std::cin, r);
 
-    exparser p;
     try {
-        expression e = p.parse(r);
+        expression e = parse(r);
         auto c = e.evaluate(eval);
 
         std::cout << "INPUT : " << e << std::endl

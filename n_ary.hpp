@@ -58,32 +58,37 @@ public:
 };
 
 /**
- * Every function type must be derived from this class
+ * TODO : Type traits instead of structs
  */
-struct function_base { };
+namespace base {
+    /**
+     * Every function type must be derived from this class
+     */
+    struct function_base { };
 
-struct variable : public function_base { 
-    static const std::size_t arity = 0;
-    typedef expr::string_type value_type;
-    value_type value;
-};
+    struct variable : public function_base { 
+        static const std::size_t arity = 0;
+        typedef expr::string_type value_type;
+        value_type value;
+    };
 
-struct constant : public function_base { 
-    static const std::size_t arity = 0; 
-    typedef expr::eval_type value_type;
-    value_type value;
-};
+    struct constant : public function_base { 
+        static const std::size_t arity = 0; 
+        typedef expr::eval_type value_type;
+        value_type value;
+    };
 
-struct sin : public function_base { static const std::size_t arity = 1; };
-struct cos : public function_base { static const std::size_t arity = 1; };
-struct tan : public function_base { static const std::size_t arity = 1; };
-struct log : public function_base { static const std::size_t arity = 1; };
+    struct sin : public function_base { static const std::size_t arity = 1; };
+    struct cos : public function_base { static const std::size_t arity = 1; };
+    struct tan : public function_base { static const std::size_t arity = 1; };
+    struct log : public function_base { static const std::size_t arity = 1; };
 
-struct add : public function_base { static const std::size_t arity = 2; };
-struct sub : public function_base { static const std::size_t arity = 2; };
-struct mul : public function_base { static const std::size_t arity = 2; };
-struct div : public function_base { static const std::size_t arity = 2; };
-struct pow : public function_base { static const std::size_t arity = 2; };
+    struct add : public function_base { static const std::size_t arity = 2; };
+    struct sub : public function_base { static const std::size_t arity = 2; };
+    struct mul : public function_base { static const std::size_t arity = 2; };
+    struct div : public function_base { static const std::size_t arity = 2; };
+    struct pow : public function_base { static const std::size_t arity = 2; };
+}
 
 /**
  * Function class with all functionality
@@ -103,7 +108,7 @@ class function<
     T, 
     typename std::enable_if<
         std::is_base_of<
-            function_base, 
+            base::function_base, 
             T
         >::value 
     >::type 
@@ -189,7 +194,7 @@ template <
         class T, 
         class = typename std::enable_if<
                 std::is_base_of<
-                        function_base, 
+                        base::function_base, 
                         T
                     >::value 
             >::type 
@@ -216,17 +221,21 @@ expr::ptr_type construct(typename T::value_type v) {
 //{ variable::value = vnum; }
 
 template <> 
-inline expr::ptr_type function<variable>::derive(
-    const expr::string_type & n)
-{ return ptr_type(new function<constant>(n == variable::value ? 1 : 0)); }
-
-template <> inline expr::string_type function<variable>::to_string()
-{ return variable::value; }
+inline expr::ptr_type function<base::variable>::derive(
+        const expr::string_type & n) { 
+    return make_constant(n == variable::value ? 1 : 0); 
+}
 
 template <> 
-inline expr::eval_type function<variable>::eval(
-    const expr::valuation_type& values)
-{ return values(variable::value); }
+inline expr::string_type function<base::variable>::to_string() { 
+    return variable::value; 
+}
+
+template <> 
+inline expr::eval_type function<base::variable>::eval(
+        const expr::valuation_type & values) { 
+    return values(variable::value); 
+}
 
 /*******************************************************
  ***** function<constant> template specialisations *****
@@ -237,259 +246,211 @@ inline expr::eval_type function<variable>::eval(
 //{ constant::value = val; }
 
 template <> 
-inline expr::ptr_type function<constant>::derive(
-    const expr::string_type &) 
-{ return ptr_type(new function<constant>(0)); }
-
-template <> inline expr::string_type function<constant>::to_string() 
-{ return std::to_string(constant::value); }
+inline expr::ptr_type function<base::constant>::derive(
+        const expr::string_type &) { 
+    return make_constant(0); 
+}
 
 template <> 
-inline expr::eval_type function<constant>::eval(const expr::valuation_type&) 
-{ return constant::value; }
+inline expr::string_type function<base::constant>::to_string() { 
+    return std::to_string(value); 
+}
+
+template <> 
+inline expr::eval_type function<base::constant>::eval(
+        const expr::valuation_type &) { 
+    return value; 
+}
 
 /*******************************************************
  *****   function<sin> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct sin>::derive(
+inline expr::ptr_type function<base::sin>::derive(
         const expr::string_type & var) {
-    auto *p = new function<struct cos>;
-    p->childs[0] = std::move(n_ary::childs[0]->clone());
-    auto *m = new function<mul>;
-    m->childs[0] = std::move(ptr_type(p));
-    m->childs[1] = std::move(n_ary::childs[0]->derive(var));
-    return ptr_type(m);
+    return cos(childs[0]) * childs[0].derive(var);
 }
 
-template <> inline expr::string_type function<struct sin>::to_string()
-{ return "sin(" + n_ary::childs[0]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::sin>::to_string() { 
+    return "sin(" + childs[0].to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct sin>::eval(
-        const expr::valuation_type& val)
-{ return std::sin(n_ary::childs[0]->eval(val)); }
+inline expr::eval_type function<base::sin>::eval(
+        const expr::valuation_type & val) { 
+    return std::sin(childs[0]->eval(val)); 
+}
 
 /*******************************************************
  *****   function<cos> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct cos>::derive(
+inline expr::ptr_type function<base::cos>::derive(
         const expr::string_type & var) {
-    auto *s = new function<struct sin>;
-    s->childs[0] = std::move(n_ary::childs[0]->clone());
-    auto *p = new function<mul>;
-    p->childs[0] = std::move(ptr_type(s));
-    p->childs[1] = std::move(n_ary::childs[0]->derive(var));
-    auto *m = new function<mul>;
-    m->childs[0] = std::move(ptr_type(new function<constant>(-1)));
-    m->childs[1] = std::move(ptr_type(p));
-    return ptr_type(m);
+    return make_constant(-1) * sin(childs[0]) * childs[0]->derive(var);
 }
 
-template <> inline expr::string_type function<struct cos>::to_string()
-{ return "cos(" + n_ary::childs[0]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::cos>::to_string() { 
+    return "cos(" + childs[0]->to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct cos>::eval(
-        const expr::valuation_type& val)
-{ return std::cos(n_ary::childs[0]->eval(val)); }
+inline expr::eval_type function<base::cos>::eval(
+        const expr::valuation_type & val) { 
+    return std::cos(childs[0]->eval(val)); 
+}
 
 /*******************************************************
  *****   function<tan> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct tan>::derive(
+inline expr::ptr_type function<base::tan>::derive(
         const expr::string_type & var) {
-    auto n5 = new function<mul>;
-    n5->childs[0] = std::move(ptr_type(new function<constant>(2)));
-    n5->childs[1] = std::move(childs[0]->clone());
-    auto n4 = new function<struct cos>;
-    n4->childs[0] = std::move(ptr_type(n5));
-    auto n3 = new function<add>;
-    n3->childs[0] = std::move(ptr_type(n4));
-    n3->childs[1] = std::move(ptr_type(new function<constant>(1)));
-    auto n2 = new function<mul>;
-    n2->childs[0] = std::move(ptr_type(new function<constant>(2)));
-    n2->childs[1] = std::move(childs[0]->derive(var));
-    auto n1 = new function<struct div>;
-    n1->childs[0] = std::move(ptr_type(n2));
-    n1->childs[1] = std::move(ptr_type(n3));
-    return ptr_type(n1);
+    return childs[0].derive(var) / pow(cos(childs[0]), make_constant(2));
 }
 
-template <> inline expr::string_type function<struct tan>::to_string()
-{ return "tan(" + childs[0]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::tan>::to_string() { 
+    return "tan(" + childs[0]->to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct tan>::eval(
-        const expr::valuation_type& val)
-{ return std::tan(childs[0]->eval(val)); }
+inline expr::eval_type function<base::tan>::eval(
+        const expr::valuation_type & val) { 
+    return std::tan(childs[0]->eval(val)); 
+}
 
 /*******************************************************
  *****   function<log> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct log>::derive(
+inline expr::ptr_type function<base::log>::derive(
         const expr::string_type & var) {
-    auto *p = new function<struct div>;
-    p->childs[0] = std::move(n_ary::childs[0]->derive(var));
-    p->childs[1] = std::move(n_ary::childs[0]->clone());
-    return ptr_type(p);
+    return childs[0].derive(var) / childs[0];
 }
 
-template <> inline expr::string_type function<struct log>::to_string()
-{ return "log(" + n_ary::childs[0]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::log>::to_string() { 
+    return "log(" + childs[0]->to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct log>::eval(const expr::valuation_type& val)
-{ return std::log(n_ary::childs[0]->eval(val)); }
+inline expr::eval_type function<base::log>::eval(
+        const expr::valuation_type & val) { 
+    return std::log(childs[0]->eval(val)); 
+}
 
 /*******************************************************
  *****   function<add> template specialisations    *****
  *******************************************************/
 
 template <> 
-inline expr::ptr_type function<add>::derive(
-        const expr::string_type & var) { 
-    auto *p = new function<add>;
-    p->childs[0] = std::move(n_ary::childs[0]->derive(var));
-    p->childs[1] = std::move(n_ary::childs[1]->derive(var));
-    return ptr_type(p);
+inline expr::ptr_type function<base::add>::derive(
+        const expr::string_type & var) {
+    return childs[0].derive(var) + childs[1].derive(var);
 }
 
-template <> inline expr::string_type function<add>::to_string()
-{ return "(" + n_ary::childs[0]->to_string() + "+" + n_ary::childs[1]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::add>::to_string() { 
+    return "(" + childs[0]->to_string() + "+" + childs[1]->to_string() + ")"; 
+}
 
 template <> 
-inline expr::eval_type function<add>::eval(const expr::valuation_type& val) 
-{ return n_ary::childs[0]->eval(val) + n_ary::childs[1]->eval(val); }
+inline expr::eval_type function<base::add>::eval(
+        const expr::valuation_type & val) { 
+    return childs[0]->eval(val) + childs[1]->eval(val); 
+}
 
 /*******************************************************
  *****   function<sub> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<sub>::derive(
+inline expr::ptr_type function<base::sub>::derive(
         const expr::string_type & var) {
-    
-    auto *p = new function<sub>(
-        operator[](0)->derive(var),
-        operator[](1)->derive(var));
-
-    return ptr_type(p);
+    return childs[0].derive(var) - childs[1].derive(var);    
 }
 
-template <> inline expr::string_type function<sub>::to_string()
-{ return "(" + operator[](0)->to_string() + "-" + operator[](1)->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::sub>::to_string() { 
+    return "(" + childs[0].to_string() + "-" + childs[1].to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<sub>::eval(const expr::valuation_type& val)
-{ return n_ary::childs[0]->eval(val) - n_ary::childs[1]->eval(val); }
+inline expr::eval_type function<base::sub>::eval(
+        const expr::valuation_type & val) { 
+    return childs[0]->eval(val) - childs[1]->eval(val); 
+}
 
 /*******************************************************
  *****   function<mul> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<mul>::derive(
+inline expr::ptr_type function<base::mul>::derive(
         const expr::string_type & var) {
-
-    auto *add_lhs = new function<mul>(
-        operator[](0)->derive(var),
-        operator[](1)->clone());
-
-    auto *add_rhs = new function<mul>(
-        ptr_type(operator[](0)->clone()),
-        ptr_type(operator[](1)->derive(var)));
-
-    auto res = new function<add>(ptr_type(add_lhs), ptr_type(add_rhs));
-
-    return ptr_type(res);
+    return childs[0].derive(var) * childs[1] + childs[0] * childs[1].derive(var);
 }
 
-template <> inline expr::string_type function<mul>::to_string()
-{ return "(" + operator[](0)->to_string() + "*" + operator[](1)->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::mul>::to_string() { 
+    return "(" + childs[0].to_string() + "*" + childs[1].to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<mul>::eval(const expr::valuation_type& val)
-{ return operator[](0)->eval(val) * operator[](1)->eval(val); }
+inline expr::eval_type function<base::mul>::eval(
+        const expr::valuation_type & val) { 
+    return operator[](0)->eval(val) * operator[](1)->eval(val); 
+}
 
 /*******************************************************
  *****   function<div> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct div>::derive(
+inline expr::ptr_type function<base::div>::derive(
         const expr::string_type & var) {
-    auto n5 = new function<struct mul>;
-    n5->childs[0] = std::move(childs[0]->clone());
-    n5->childs[1] = std::move(childs[1]->derive(var));
-    auto n4 = new function<struct mul>;
-    n4->childs[0] = std::move(childs[1]->clone());
-    n4->childs[1] = std::move(childs[0]->derive(var));
-    auto n3 = new function<struct pow>;
-    n3->childs[0] = std::move(childs[1]->clone());
-    n3->childs[1] = std::move(ptr_type(new function<constant>(2)));
-    auto n2 = new function<struct sub>;
-    n2->childs[0] = std::move(ptr_type(n4));
-    n2->childs[1] = std::move(ptr_type(n5));
-    auto n1 = new function<struct div>;
-    n1->childs[0] = std::move(ptr_type(n2));
-    n1->childs[1] = std::move(ptr_type(n3));
-    return ptr_type(n1);
+    return (childs[0].derive(var) * childs[1] - childs[0] * childs[1].derive(var)) 
+        / pow(childs[1], make_constant(2));
 }
 
-template <> inline expr::string_type function<struct div>::to_string()
-{ return "(" + childs[0]->to_string() + "/" + childs[1]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::div>::to_string() { 
+    return "(" + childs[0]->to_string() + "/" + childs[1]->to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct div>::eval(const expr::valuation_type& val)
-{ return childs[0]->eval(val) / childs[1]->eval(val); }
+inline expr::eval_type function<base::div>::eval(
+        const expr::valuation_type & val) { 
+    return childs[0]->eval(val) / childs[1]->eval(val); 
+}
 
 /*******************************************************
  *****   function<pow> template specialisations    *****
  *******************************************************/
 
 template <>
-inline expr::ptr_type function<struct pow>::derive(
+inline expr::ptr_type function<base::pow>::derive(
         const expr::string_type & var) {
-    auto n8 = new function<struct log>;
-    n8->childs[0] = std::move(childs[0]->clone());
-    auto n7 = new function<struct mul>;
-    n7->childs[0] = std::move(ptr_type(n8));
-    n7->childs[1] = std::move(childs[1]->derive(var));
-    auto n6 = new function<struct mul>;
-    n6->childs[0] = std::move(childs[0]->derive(var));
-    n6->childs[1] = std::move(ptr_type(n7));
-    auto n5 = new function<struct mul>;
-    n5->childs[0] = std::move(childs[1]->clone());
-    n5->childs[1] = std::move(childs[0]->derive(var));
-    auto n4 = new function<struct sub>;
-    n4->childs[0] = std::move(childs[1]->clone());
-    n4->childs[1] = std::move(ptr_type(new function<constant>(1)));
-    auto n3 = new function<struct add>;
-    n3->childs[0] = std::move(ptr_type(n5));
-    n3->childs[1] = std::move(ptr_type(n6));
-    auto n2 = new function<struct pow>;
-    n2->childs[0] = std::move(childs[0]->clone());
-    n2->childs[1] = std::move(ptr_type(n4));
-    auto n1 = new function<struct mul>;
-    n1->childs[0] = std::move(ptr_type(n2));
-    n1->childs[1] = std::move(ptr_type(n3));
-    return ptr_type(n1);
+    return ::pow(childs[0], childs[1]) * (childs[1] * ::log(childs[0])).derive(var);
 }
 
-template <> inline expr::string_type function<struct pow>::to_string()
-{ return "(" + childs[0]->to_string() + "^" + childs[1]->to_string() + ")"; }
+template <> 
+inline expr::string_type function<base::pow>::to_string() { 
+    return "(" + childs[0]->to_string() + "^" + childs[1]->to_string() + ")"; 
+}
 
 template <>
-inline expr::eval_type function<struct pow>::eval(const expr::valuation_type& val)
-{ return std::pow(childs[0]->eval(val), childs[1]->eval(val)); }
+inline expr::eval_type function<base::pow>::eval(
+        const expr::valuation_type & val) { 
+    return std::pow(childs[0]->eval(val), childs[1]->eval(val)); 
+}
 
 } // end of namespace ex
 
