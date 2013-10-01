@@ -22,6 +22,7 @@ expression::expression(std::unique_ptr<ex::expr> && unique)
 }
 
 expression& expression::operator= (const expression & expr) {
+    if (expr.empty()) return *this = expression();
     return *this = std::move(expr.tree->clone());
 }
 
