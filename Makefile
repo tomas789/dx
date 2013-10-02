@@ -20,7 +20,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $(EXECUTABLE)
 
 %.d: $(SOURCES)
-	$(CXX) $(CXXFLAGS) -MM $? > $@
+	$(CXX) -MM $? > $@
 
 -include ${SOURCES:.cpp=.d}
 
