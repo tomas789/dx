@@ -188,6 +188,8 @@ exparser::return_type exparser::parse_function(const std::string& s) {
         return return_type(true, cos(std::get<1>(inner)));
     else if (s.substr(0, pos) == "tan") 
         return return_type(true, tan(std::get<1>(inner)));
+    else if (s.substr(0, pos) == "log")
+        return return_type(true, log(std::get<1>(inner)));
     else return return_false;
 }
 
