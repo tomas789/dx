@@ -10,9 +10,9 @@ future transform to Genetic Programming library.
 Comtributors
 ------------
 
- o Tomas Krejci
-   - Charles University in Prague, Czech Republic
-   - tomas789 -at- gmail -dot- com
+* Tomas Krejci
+  * Charles University in Prague, Czech Republic
+  * tomas789 -at- gmail -dot- com
 
 How To Install
 --------------
@@ -30,9 +30,9 @@ further restrictions and no dynamic dependencies.
 C++11
 -----
 
- o Smart Pointers
- o Move Semantics
- o std::array
+* Smart Pointers
+* Move Semantics
+* std::array
 
 Supported Compilers
 -------------------
@@ -40,11 +40,11 @@ Supported Compilers
 List of supported compilers is restricted especially by it's support of C++11.
 Some tested compilers are:
 
- o GCC 4.9.0 20130915 (experimental)
- o GCC 4.8.1
- o GCC 4.7.3
- o GCC 4.6.4
- o Apple LLVM version 5.0 (clang-500.2.76) (based on LLVM 3.3svn)
+* GCC 4.9.0 20130915 (experimental)
+* GCC 4.8.1
+* GCC 4.7.3
+* GCC 4.6.4
+* Apple LLVM version 5.0 (clang-500.2.76) (based on LLVM 3.3svn)
 
 Microsoft Visual C++ is currently NOT supported.
 
@@ -73,13 +73,13 @@ As a parser there is used Recursice Descent parsing (http://en.wikipedia.org/wik
 
 It loops through set of possible variant and try to match given input to parser definition. It returns tuple of bool (was parsing successful) and value of parsed input - object of expression type.
 
- o Expression Representation
- o Expression class functionality
- o How to extend library
+### Expression Representation
+### Expression class functionality
+### How to extend library
 
 TODO
 ----
 
- o Support for GP (genetic programming)
- o Extendability
- o Symbol traits
+### Support for GP (genetic programming)
+### Extendability
+### Symbol traits
