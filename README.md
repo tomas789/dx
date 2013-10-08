@@ -69,7 +69,7 @@ Internals
 
 ### Parser
 
-As a parser there is used Recursice Descent parsing (http://en.wikipedia.org/wiki/Recursive_descent_parser). Whole parser code is defined in class exparser (defined in exparser.hpp and implemented exparser.cpp).
+As a parser there is used [Recursice Descent parsing](http://en.wikipedia.org/wiki/Recursive_descent_parser). Whole parser code is defined in class exparser (defined in exparser.hpp and implemented exparser.cpp).
 
 It loops through set of possible variant and try to match given input to parser definition. It returns tuple of bool (was parsing successful) and value of parsed input - object of expression type.
 
