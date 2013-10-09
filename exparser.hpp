@@ -4,11 +4,13 @@
 #include <tuple>
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include "expression.hpp"
 
 class exparser {
 public:
-    typedef std::tuple<bool, expression> return_type;
+    typedef boost::optional<expression> return_type;
 
     static const bool debug = false;
 
