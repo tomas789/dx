@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -pedantic -std=c++11 -Wno-tautological-compare
+CXXFLAGS += -Wall -pedantic -std=c++11 -Wno-tautological-compare
 SOURCES = exparser.cpp expression.cpp main.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = dx
@@ -16,13 +16,14 @@ distclean: clean
 
 clean_list += ${SOURCES:.cpp=.d}
 
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $<
+
 $(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $(EXECUTABLE)
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(EXECUTABLE)
 
 %.d: $(SOURCES)
-	$(CXX) -MM $? > $@
+	$(CXX) $(CXXFLAGS) -MM $? > $@
 
 -include ${SOURCES:.cpp=.d}
 
-# .cpp.o:
-# 	$(CXX) $(CXXFLAGS) -c $<
