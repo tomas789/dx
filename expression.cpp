@@ -58,7 +58,10 @@ expression expression::derive(const string_type& val) const {
 }
 
 double expression::evaluate(const valuation_type & v) {
-    return tree->eval(v);
+    ex::eval_visitor ev(v);
+    ex::generic_visitor<ex::eval_visitor> visitor(ev);
+    auto res = tree->accept(visitor);
+    return boost::any_cast<double>(res);
 }
 
 std::unique_ptr<ex::expr> & expression::operator-> () {

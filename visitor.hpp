@@ -27,6 +27,9 @@ class generic_visitor : public abstract_visitor {
     U u;
     
 public:
+    generic_visitor() = default;
+    generic_visitor(const U & u_) : u(u_) { }
+
     virtual boost::any visit(function<base::variable> & c) {
         return u.visit(c);
     }

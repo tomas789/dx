@@ -61,6 +61,71 @@ boost::any printer_visitor::visit(ex::function<ex::base::pow> & c) {
     return std::string("(" + recursive(c, 0) + "^" + recursive(c, 1) + ")");
 }
 
+eval_visitor::eval_visitor(const globals::valuation_type & v_)
+  : v(v_) {
+}
+
+eval_visitor::eval_visitor(const eval_visitor & e)
+  : v(e.v) {
+}
+
+globals::eval_type eval_visitor::recursive(expr & e, globals::size_type num) {
+    eval_visitor ev(*this);
+    generic_visitor<eval_visitor> v(ev);
+    return boost::any_cast<globals::eval_type>(
+            e[num]->accept(v)
+        );
+}
+
+boost::any eval_visitor::visit(expr & e) {
+    return 0;
+}
+
+boost::any eval_visitor::visit(function<base::variable> & c) {
+    return v(c.value);
+}
+
+boost::any eval_visitor::visit(function<base::constant> & c) {
+    return c.value;
+}
+
+boost::any eval_visitor::visit(function<base::sin> & c) {
+    return std::sin(recursive(c, 0));
+}
+
+boost::any eval_visitor::visit(function<base::cos> & c) {
+    return std::cos(recursive(c, 0));
+}
+
+boost::any eval_visitor::visit(function<base::tan> & c) {
+    return std::tan(recursive(c, 0));
+}
+
+boost::any eval_visitor::visit(function<base::log> & c) {
+    return std::log(recursive(c, 0));
+}
+
+boost::any eval_visitor::visit(function<base::add> & c) {
+    return recursive(c, 0) + recursive(c, 1);
+}
+
+boost::any eval_visitor::visit(function<base::sub> & c) {
+    return recursive(c, 0) - recursive(c, 1);
+}
+
+boost::any eval_visitor::visit(function<base::mul> & c) {
+    return recursive(c, 0) * recursive(c, 1);
+}
+
+boost::any eval_visitor::visit(function<base::div> & c) {
+    return recursive(c, 0) / recursive(c, 1);
+}
+
+boost::any eval_visitor::visit(function<base::pow> & c) {
+    return std::pow(recursive(c, 0), recursive(c, 1));
+}
+
+
 }
 
 

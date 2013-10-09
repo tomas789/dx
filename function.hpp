@@ -103,7 +103,6 @@ public:
     }
 
     expr::ptr_type derive(const expr::string_type & var);
-    expr::eval_type eval(const expr::valuation_type & values);
 
     /**
      * Virtual copy constructor using actual copy constructor
@@ -157,12 +156,6 @@ inline expr::ptr_type function<base::variable>::derive(
     return make_constant(n == variable::value ? 1 : 0); 
 }
 
-template <> 
-inline expr::eval_type function<base::variable>::eval(
-        const expr::valuation_type & values) { 
-    return values(variable::value); 
-}
-
 /*******************************************************
  ***** function<constant> template specialisations *****
  *******************************************************/
@@ -177,12 +170,6 @@ inline expr::ptr_type function<base::constant>::derive(
     return make_constant(0); 
 }
 
-template <> 
-inline expr::eval_type function<base::constant>::eval(
-        const expr::valuation_type &) { 
-    return value; 
-}
-
 /*******************************************************
  *****   function<sin> template specialisations    *****
  *******************************************************/
@@ -191,12 +178,6 @@ template <>
 inline expr::ptr_type function<base::sin>::derive(
         const expr::string_type & var) {
     return cos(childs[0]) * childs[0].derive(var);
-}
-
-template <>
-inline expr::eval_type function<base::sin>::eval(
-        const expr::valuation_type & val) { 
-    return std::sin(childs[0]->eval(val)); 
 }
 
 /*******************************************************
@@ -209,12 +190,6 @@ inline expr::ptr_type function<base::cos>::derive(
     return make_constant(-1) * sin(childs[0]) * childs[0]->derive(var);
 }
 
-template <>
-inline expr::eval_type function<base::cos>::eval(
-        const expr::valuation_type & val) { 
-    return std::cos(childs[0]->eval(val)); 
-}
-
 /*******************************************************
  *****   function<tan> template specialisations    *****
  *******************************************************/
@@ -223,12 +198,6 @@ template <>
 inline expr::ptr_type function<base::tan>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) / pow(cos(childs[0]), make_constant(2));
-}
-
-template <>
-inline expr::eval_type function<base::tan>::eval(
-        const expr::valuation_type & val) { 
-    return std::tan(childs[0]->eval(val)); 
 }
 
 /*******************************************************
@@ -241,12 +210,6 @@ inline expr::ptr_type function<base::log>::derive(
     return childs[0].derive(var) / childs[0];
 }
 
-template <>
-inline expr::eval_type function<base::log>::eval(
-        const expr::valuation_type & val) { 
-    return std::log(childs[0]->eval(val)); 
-}
-
 /*******************************************************
  *****   function<add> template specialisations    *****
  *******************************************************/
@@ -255,12 +218,6 @@ template <>
 inline expr::ptr_type function<base::add>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) + childs[1].derive(var);
-}
-
-template <> 
-inline expr::eval_type function<base::add>::eval(
-        const expr::valuation_type & val) { 
-    return childs[0]->eval(val) + childs[1]->eval(val); 
 }
 
 /*******************************************************
@@ -273,12 +230,6 @@ inline expr::ptr_type function<base::sub>::derive(
     return childs[0].derive(var) - childs[1].derive(var);    
 }
 
-template <>
-inline expr::eval_type function<base::sub>::eval(
-        const expr::valuation_type & val) { 
-    return childs[0]->eval(val) - childs[1]->eval(val); 
-}
-
 /*******************************************************
  *****   function<mul> template specialisations    *****
  *******************************************************/
@@ -287,12 +238,6 @@ template <>
 inline expr::ptr_type function<base::mul>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) * childs[1] + childs[0] * childs[1].derive(var);
-}
-
-template <>
-inline expr::eval_type function<base::mul>::eval(
-        const expr::valuation_type & val) { 
-    return operator[](0)->eval(val) * operator[](1)->eval(val); 
 }
 
 /*******************************************************
@@ -306,12 +251,6 @@ inline expr::ptr_type function<base::div>::derive(
         / pow(childs[1], make_constant(2));
 }
 
-template <>
-inline expr::eval_type function<base::div>::eval(
-        const expr::valuation_type & val) { 
-    return childs[0]->eval(val) / childs[1]->eval(val); 
-}
-
 /*******************************************************
  *****   function<pow> template specialisations    *****
  *******************************************************/
@@ -320,12 +259,6 @@ template <>
 inline expr::ptr_type function<base::pow>::derive(
         const expr::string_type & var) {
     return ::pow(childs[0], childs[1]) * (childs[1] * ::log(childs[0])).derive(var);
-}
-
-template <>
-inline expr::eval_type function<base::pow>::eval(
-        const expr::valuation_type & val) { 
-    return std::pow(childs[0]->eval(val), childs[1]->eval(val)); 
 }
 
 }

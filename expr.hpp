@@ -8,6 +8,8 @@
 #include <functional>
 #include <boost/any.hpp>
 
+#include "globals.hpp"
+
 class expression;
 
 namespace ex {
@@ -33,7 +35,6 @@ public:
 
     virtual ptr_type derive(const string_type& var) = 0;
     virtual ptr_type clone() = 0;
-    virtual eval_type eval(const valuation_type& values) = 0;
     
     virtual size_type arity() = 0;
     virtual ptr_type & operator[] (size_type n) = 0;
