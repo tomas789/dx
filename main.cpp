@@ -22,6 +22,7 @@ int main(int argc, char ** argv) {
                   << "DERIVED BY x : " << e.derive("x") << std::endl
                   << "EVALUATED : " << c << std::endl
                   << "EVALUATED DERIVATION BY x : " << e.derive("x").evaluate(eval) << std::endl;
+
     } catch (std::string e) {
         std::cerr << "EXCEPTION: " << e << std::endl;
     }

@@ -1,10 +1,15 @@
+#include <boost/any.hpp>
+
 #include "expression.hpp"
 
+#include "visitor.hpp"
 #include "exparser.hpp"
 #include "function_base.hpp"
 #include "function.hpp"
 #include "expr.hpp"
 #include "n_ary.hpp"
+#include "visitor.hpp"
+#include "visitor_impl.hpp"
 
 expression::expression()
   : tree() { }
@@ -103,7 +108,9 @@ expression parse(const std::string & s) {
 }
 
 std::ostream& operator<< (std::ostream& out, const expression& expr) {
-    return out << expr.tree->to_string();
+    ex::generic_visitor<ex::printer_visitor> v;
+    auto res = expr.tree->accept(v);
+    return out << boost::any_cast<std::string>(res);
 }
 
 expression make_constant(double c) {

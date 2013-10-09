@@ -8,8 +8,6 @@
 #include <functional>
 #include <boost/any.hpp>
 
-#include "traits.hpp"
-
 class expression;
 
 namespace ex {

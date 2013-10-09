@@ -4,7 +4,7 @@
 #include <boost/any.hpp>
 
 #include "function_base.hpp"
-#include "function.hpp"
+#include "function_forward.hpp"
 
 namespace ex {
 

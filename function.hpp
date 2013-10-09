@@ -5,17 +5,11 @@
 #include <string>
 #include <memory>
 #include <array>
-#include <vector>
 #include <type_traits>
 #include <cmath>
 
-namespace ex {
-
-template <class T, class Enable = void>
-class function;
-
-}
-
+#include "function_forward.hpp"
+#include "expression.hpp"
 #include "n_ary.hpp"
 #include "function_base.hpp"
 #include "traits.hpp"
