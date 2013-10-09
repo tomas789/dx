@@ -1,6 +1,8 @@
 #include "expression.hpp"
 
 #include "exparser.hpp"
+#include "function_base.hpp"
+#include "function.hpp"
 #include "expr.hpp"
 #include "n_ary.hpp"
 

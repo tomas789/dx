@@ -2,7 +2,6 @@
 #define EXPRESSION_HPP
 
 #include <iostream>
-#include <vector>
 #include <memory>
 
 #include "expr.hpp"

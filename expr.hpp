@@ -6,6 +6,7 @@
  */
 
 #include <functional>
+#include <boost/any.hpp>
 
 #include "traits.hpp"
 
@@ -13,8 +14,7 @@ class expression;
 
 namespace ex {
 
-template <class T, class Enable = void>
-class function;
+struct abstract_visitor;
 
 /**
  * Virtual super-class for expression tree
@@ -40,6 +40,8 @@ public:
     
     virtual size_type arity() = 0;
     virtual ptr_type & operator[] (size_type n) = 0;
+
+    virtual boost::any accept(abstract_visitor & v) = 0;
 };
 
 
