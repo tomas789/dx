@@ -44,8 +44,11 @@ bool expression::empty() const {
 }
 
 expression::string_type expression::to_string() const {
-    if (! empty()) return tree->to_string();
-    return string_type();
+    if (!empty()) {
+        ex::generic_visitor<ex::printer_visitor> v;
+        auto res = tree->accept(v);
+        return boost::any_cast<std::string>(res);
+    } else return "";
 }
 
 expression expression::derive(const string_type& val) const {

@@ -103,7 +103,6 @@ public:
     }
 
     expr::ptr_type derive(const expr::string_type & var);
-    expr::string_type to_string();
     expr::eval_type eval(const expr::valuation_type & values);
 
     /**
@@ -159,11 +158,6 @@ inline expr::ptr_type function<base::variable>::derive(
 }
 
 template <> 
-inline expr::string_type function<base::variable>::to_string() { 
-    return variable::value; 
-}
-
-template <> 
 inline expr::eval_type function<base::variable>::eval(
         const expr::valuation_type & values) { 
     return values(variable::value); 
@@ -184,11 +178,6 @@ inline expr::ptr_type function<base::constant>::derive(
 }
 
 template <> 
-inline expr::string_type function<base::constant>::to_string() { 
-    return std::to_string(value); 
-}
-
-template <> 
 inline expr::eval_type function<base::constant>::eval(
         const expr::valuation_type &) { 
     return value; 
@@ -202,11 +191,6 @@ template <>
 inline expr::ptr_type function<base::sin>::derive(
         const expr::string_type & var) {
     return cos(childs[0]) * childs[0].derive(var);
-}
-
-template <> 
-inline expr::string_type function<base::sin>::to_string() { 
-    return "sin(" + childs[0].to_string() + ")"; 
 }
 
 template <>
@@ -225,11 +209,6 @@ inline expr::ptr_type function<base::cos>::derive(
     return make_constant(-1) * sin(childs[0]) * childs[0]->derive(var);
 }
 
-template <> 
-inline expr::string_type function<base::cos>::to_string() { 
-    return "cos(" + childs[0]->to_string() + ")"; 
-}
-
 template <>
 inline expr::eval_type function<base::cos>::eval(
         const expr::valuation_type & val) { 
@@ -246,11 +225,6 @@ inline expr::ptr_type function<base::tan>::derive(
     return childs[0].derive(var) / pow(cos(childs[0]), make_constant(2));
 }
 
-template <> 
-inline expr::string_type function<base::tan>::to_string() { 
-    return "tan(" + childs[0]->to_string() + ")"; 
-}
-
 template <>
 inline expr::eval_type function<base::tan>::eval(
         const expr::valuation_type & val) { 
@@ -265,11 +239,6 @@ template <>
 inline expr::ptr_type function<base::log>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) / childs[0];
-}
-
-template <> 
-inline expr::string_type function<base::log>::to_string() { 
-    return "log(" + childs[0]->to_string() + ")"; 
 }
 
 template <>
@@ -289,11 +258,6 @@ inline expr::ptr_type function<base::add>::derive(
 }
 
 template <> 
-inline expr::string_type function<base::add>::to_string() { 
-    return "(" + childs[0]->to_string() + "+" + childs[1]->to_string() + ")"; 
-}
-
-template <> 
 inline expr::eval_type function<base::add>::eval(
         const expr::valuation_type & val) { 
     return childs[0]->eval(val) + childs[1]->eval(val); 
@@ -307,11 +271,6 @@ template <>
 inline expr::ptr_type function<base::sub>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) - childs[1].derive(var);    
-}
-
-template <> 
-inline expr::string_type function<base::sub>::to_string() { 
-    return "(" + childs[0].to_string() + "-" + childs[1].to_string() + ")"; 
 }
 
 template <>
@@ -328,11 +287,6 @@ template <>
 inline expr::ptr_type function<base::mul>::derive(
         const expr::string_type & var) {
     return childs[0].derive(var) * childs[1] + childs[0] * childs[1].derive(var);
-}
-
-template <> 
-inline expr::string_type function<base::mul>::to_string() { 
-    return "(" + childs[0].to_string() + "*" + childs[1].to_string() + ")"; 
 }
 
 template <>
@@ -352,11 +306,6 @@ inline expr::ptr_type function<base::div>::derive(
         / pow(childs[1], make_constant(2));
 }
 
-template <> 
-inline expr::string_type function<base::div>::to_string() { 
-    return "(" + childs[0]->to_string() + "/" + childs[1]->to_string() + ")"; 
-}
-
 template <>
 inline expr::eval_type function<base::div>::eval(
         const expr::valuation_type & val) { 
@@ -371,11 +320,6 @@ template <>
 inline expr::ptr_type function<base::pow>::derive(
         const expr::string_type & var) {
     return ::pow(childs[0], childs[1]) * (childs[1] * ::log(childs[0])).derive(var);
-}
-
-template <> 
-inline expr::string_type function<base::pow>::to_string() { 
-    return "(" + childs[0]->to_string() + "^" + childs[1]->to_string() + ")"; 
 }
 
 template <>

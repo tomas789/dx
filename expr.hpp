@@ -33,7 +33,6 @@ public:
 
     virtual ptr_type derive(const string_type& var) = 0;
     virtual ptr_type clone() = 0;
-    virtual string_type to_string() = 0;
     virtual eval_type eval(const valuation_type& values) = 0;
     
     virtual size_type arity() = 0;
