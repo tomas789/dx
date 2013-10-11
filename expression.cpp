@@ -64,6 +64,12 @@ double expression::evaluate(const valuation_type & v) {
     return boost::any_cast<double>(res);
 }
 
+bool expression::is_constant() {
+    ex::generic_visitor<ex::is_constant_visitor> v;
+    auto res = tree->accept(v);
+    return boost::any_cast<bool>(res);
+}
+
 std::unique_ptr<ex::expr> & expression::operator-> () {
     return tree;
 }

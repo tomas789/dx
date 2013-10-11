@@ -125,6 +125,27 @@ boost::any eval_visitor::visit(function<base::pow> & c) {
     return std::pow(recursive(c, 0), recursive(c, 1));
 }
 
+bool is_constant_visitor::recursive(ex::expr & e, std::size_t num) {
+    ex::generic_visitor<is_constant_visitor> v;
+    return boost::any_cast<bool>(
+            e[num]->accept(v)
+        );
+}
+
+boost::any is_constant_visitor::visit(ex::expr & e) {
+    for (std::size_t i = 0; i < e.arity(); ++i)
+        if (!recursive(e, i)) return false;
+
+    return true;
+}
+
+boost::any is_constant_visitor::visit(function<base::variable> &) {
+    return false;
+}
+
+boost::any is_constant_visitor::visit(function<base::constant> &) {
+    return true;
+}
 
 }
 

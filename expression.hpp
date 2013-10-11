@@ -6,6 +6,10 @@
 
 #include "expr.hpp"
 
+namespace ex {
+    struct abstract_visitor;
+}
+
 class expression {
     std::unique_ptr<ex::expr> tree;
 
@@ -30,6 +34,9 @@ public:
     string_type to_string() const;
     expression derive(const string_type &) const;
     eval_type evaluate(const valuation_type & v);
+    
+    expression & simplify();
+    bool is_constant();
 
     std::unique_ptr<ex::expr> & operator-> ();
     const std::unique_ptr<ex::expr> & operator-> () const;

@@ -21,7 +21,8 @@ int main(int argc, char ** argv) {
         std::cout << "INPUT : " << e << std::endl
                   << "DERIVED BY x : " << e.derive("x") << std::endl
                   << "EVALUATED : " << c << std::endl
-                  << "EVALUATED DERIVATION BY x : " << e.derive("x").evaluate(eval) << std::endl;
+                  << "EVALUATED DERIVATION BY x : " << e.derive("x").evaluate(eval) << std::endl
+                  << "IS CONSTANT : " << e.is_constant() << std::endl;
 
     } catch (std::string e) {
         std::cerr << "EXCEPTION: " << e << std::endl;

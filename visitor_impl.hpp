@@ -51,7 +51,13 @@ public:
     boost::any visit(ex::function<ex::base::pow> & c);
 };
 
-
+class is_constant_visitor {
+    bool recursive(expr & e, std::size_t num);
+public:
+    boost::any visit(ex::expr & e);
+    boost::any visit(function<base::variable> &);
+    boost::any visit(function<base::constant> &);
+};
 
 }
 
