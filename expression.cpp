@@ -46,28 +46,22 @@ bool expression::empty() const {
 expression::string_type expression::to_string() const {
     if (!empty()) {
         ex::generic_visitor<ex::printer_visitor> v;
-        auto res = tree->accept(v);
-        return boost::any_cast<std::string>(res);
+         tree->accept(v);
+        return v->get_result();;
     } else return "";
-}
-
-expression expression::derive(const string_type& val) const {
-    if (! empty()) 
-        return expression(std::move(tree->derive(val)));
-    return expression();
 }
 
 double expression::evaluate(const valuation_type & v) {
     ex::eval_visitor ev(v);
     ex::generic_visitor<ex::eval_visitor> visitor(ev);
-    auto res = tree->accept(visitor);
-    return boost::any_cast<double>(res);
+    tree->accept(visitor);
+    return visitor->get_result();;
 }
 
 bool expression::is_constant() {
     ex::generic_visitor<ex::is_constant_visitor> v;
-    auto res = tree->accept(v);
-    return boost::any_cast<bool>(res);
+    tree->accept(v);
+    return v->get_result();
 }
 
 std::unique_ptr<ex::expr> & expression::operator-> () {
@@ -121,8 +115,8 @@ expression parse(const std::string & s) {
 
 std::ostream& operator<< (std::ostream& out, const expression& expr) {
     ex::generic_visitor<ex::printer_visitor> v;
-    auto res = expr.tree->accept(v);
-    return out << boost::any_cast<std::string>(res);
+    expr.tree->accept(v);
+    return out << v->get_result();
 }
 
 expression make_constant(double c) {

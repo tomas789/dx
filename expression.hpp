@@ -32,7 +32,6 @@ public:
     size_type arity() const;
     expression & operator[] (size_type n);
     string_type to_string() const;
-    expression derive(const string_type &) const;
     eval_type evaluate(const valuation_type & v);
     
     expression & simplify();

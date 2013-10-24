@@ -33,13 +33,12 @@ public:
     typedef std::function<eval_type(string_type)> valuation_type;
     typedef std::size_t size_type;
 
-    virtual ptr_type derive(const string_type& var) = 0;
     virtual ptr_type clone() = 0;
     
     virtual size_type arity() = 0;
     virtual ptr_type & operator[] (size_type n) = 0;
 
-    virtual boost::any accept(abstract_visitor & v) = 0;
+    virtual void accept(abstract_visitor & v) = 0;
 };
 
 

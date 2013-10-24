@@ -6,145 +6,167 @@
 
 namespace ex {
 
-std::string printer_visitor::recursive(ex::expr & e, std::size_t num) {
-    ex::generic_visitor<printer_visitor> v;
-    return boost::any_cast<std::string>(
-            e[num]->accept(v)
-        );
+void printer_visitor::visit(ex::expr & e) {
+    result += "general_expression";
 }
 
-boost::any printer_visitor::visit(ex::expr & e) {
-    return std::string("general_expression");
+void printer_visitor::visit(ex::function<ex::base::variable> & c) {
+    result += c.value;
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::variable> & c) {
-    return c.value;
+void printer_visitor::visit(ex::function<ex::base::constant> & c) {
+    result += std::to_string(c.value);
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::constant> & c) {
-    return boost::lexical_cast<std::string>(c.value);
+void printer_visitor::visit(ex::function<ex::base::sin> & c) {
+    result += "sin(";
+    c[0]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::sin> & c) {
-    return std::string("sin(") + recursive(c, 0) + std::string(")");
+void printer_visitor::visit(ex::function<ex::base::cos> & c) {
+    result += "cos(";
+    c[0]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::cos> & c) {
-    return std::string("cos(") + recursive(c, 0) + std::string(")");
+void printer_visitor::visit(ex::function<ex::base::tan> & c) {
+    result += "tan(";
+    c[0]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::tan> & c) {
-    return std::string("tan(") + recursive(c, 0) + std::string(")");
+void printer_visitor::visit(ex::function<ex::base::log> & c) {
+    result = "log(";
+    c[0]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::log> & c) {
-    return std::string("log(") + recursive(c, 0) + std::string(")");
+void printer_visitor::visit(ex::function<ex::base::add> & c) {
+    result += "(";
+    c[0]->accept(*gen_);
+    result += "+";
+    c[1]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::add> & c) {
-    return std::string("(" + recursive(c, 0) + "+" + recursive(c, 1) + ")");
+void printer_visitor::visit(ex::function<ex::base::sub> & c) {
+    result += "(";
+    c[0]->accept(*gen_);
+    result += "-";
+    c[1]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::sub> & c) {
-    return std::string("(" + recursive(c, 0) + "-" + recursive(c, 1) + ")");
+void printer_visitor::visit(ex::function<ex::base::mul> & c) {
+    result += "(";
+    c[0]->accept(*gen_);
+    result += "*";
+    c[1]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::mul> & c) {
-    return std::string("(" + recursive(c, 0) + "*" + recursive(c, 1) + ")");
+void printer_visitor::visit(ex::function<ex::base::div> & c) {
+    result += "(";
+    c[0]->accept(*gen_);
+    result += "/";
+    c[1]->accept(*gen_);
+    result += ")";
 }
 
-boost::any printer_visitor::visit(ex::function<ex::base::div> & c) {
-    return std::string("(" + recursive(c, 0) + "/" + recursive(c, 1) + ")");
-}
-
-boost::any printer_visitor::visit(ex::function<ex::base::pow> & c) {
-    return std::string("(" + recursive(c, 0) + "^" + recursive(c, 1) + ")");
+void printer_visitor::visit(ex::function<ex::base::pow> & c) {
+    result += "(";
+    c[0]->accept(*gen_);
+    result += "^";
+    c[1]->accept(*gen_);
+    result += ")";
 }
 
 eval_visitor::eval_visitor(const globals::valuation_type & v_)
-  : v(v_) {
-}
+  : v(v_) { }
 
 eval_visitor::eval_visitor(const eval_visitor & e)
-  : v(e.v) {
+  : v(e.v) { }
+
+void eval_visitor::visit(expr & e) {
+    result = 0;
 }
 
-globals::eval_type eval_visitor::recursive(expr & e, globals::size_type num) {
-    eval_visitor ev(*this);
-    generic_visitor<eval_visitor> v(ev);
-    return boost::any_cast<globals::eval_type>(
-            e[num]->accept(v)
-        );
+void eval_visitor::visit(function<base::variable> & c) {
+    result = v(c.value);
 }
 
-boost::any eval_visitor::visit(expr & e) {
-    return 0;
+void eval_visitor::visit(function<base::constant> & c) {
+    result = c.value;
 }
 
-boost::any eval_visitor::visit(function<base::variable> & c) {
-    return v(c.value);
+void eval_visitor::visit(function<base::sin> & c) {
+    c[0]->accept(*gen_);
+    result = std::sin(result);
 }
 
-boost::any eval_visitor::visit(function<base::constant> & c) {
-    return c.value;
+void eval_visitor::visit(function<base::cos> & c) {
+    c[0]->accept(*gen_);
+    result = std::cos(result);
 }
 
-boost::any eval_visitor::visit(function<base::sin> & c) {
-    return std::sin(recursive(c, 0));
+void eval_visitor::visit(function<base::tan> & c) {
+    c[0]->accept(*gen_);
+    result = std::tan(result);
 }
 
-boost::any eval_visitor::visit(function<base::cos> & c) {
-    return std::cos(recursive(c, 0));
+void eval_visitor::visit(function<base::log> & c) {
+    c[0]->accept(*gen_);
+    result = std::log(result);
 }
 
-boost::any eval_visitor::visit(function<base::tan> & c) {
-    return std::tan(recursive(c, 0));
+void eval_visitor::visit(function<base::add> & c) {
+    c[0]->accept(*gen_);
+    double lhs = result;
+    c[1]->accept(*gen_);
+    double rhs = result;
+    result = lhs + rhs;
 }
 
-boost::any eval_visitor::visit(function<base::log> & c) {
-    return std::log(recursive(c, 0));
+void eval_visitor::visit(function<base::sub> & c) {
+    c[0]->accept(*gen_);
+    double lhs = result;
+    c[1]->accept(*gen_);
+    double rhs = result;
+    result = lhs - rhs;
 }
 
-boost::any eval_visitor::visit(function<base::add> & c) {
-    return recursive(c, 0) + recursive(c, 1);
+void eval_visitor::visit(function<base::mul> & c) {
+    c[0]->accept(*gen_);
+    double lhs = result;
+    c[1]->accept(*gen_);
+    double rhs = result;
+    result = lhs * rhs;
 }
 
-boost::any eval_visitor::visit(function<base::sub> & c) {
-    return recursive(c, 0) - recursive(c, 1);
+void eval_visitor::visit(function<base::div> & c) {
+    c[0]->accept(*gen_);
+    double lhs = result;
+    c[1]->accept(*gen_);
+    double rhs = result;
+    result = lhs / rhs;
 }
 
-boost::any eval_visitor::visit(function<base::mul> & c) {
-    return recursive(c, 0) * recursive(c, 1);
+void eval_visitor::visit(function<base::pow> & c) {
+    c[0]->accept(*gen_);
+    double lhs = result;
+    c[1]->accept(*gen_);
+    double rhs = result;
+    result = std::pow(lhs, rhs);
 }
 
-boost::any eval_visitor::visit(function<base::div> & c) {
-    return recursive(c, 0) / recursive(c, 1);
-}
-
-boost::any eval_visitor::visit(function<base::pow> & c) {
-    return std::pow(recursive(c, 0), recursive(c, 1));
-}
-
-bool is_constant_visitor::recursive(ex::expr & e, std::size_t num) {
-    ex::generic_visitor<is_constant_visitor> v;
-    return boost::any_cast<bool>(
-            e[num]->accept(v)
-        );
-}
-
-boost::any is_constant_visitor::visit(ex::expr & e) {
+void is_constant_visitor::visit(ex::expr & e) {
     for (std::size_t i = 0; i < e.arity(); ++i)
-        if (!recursive(e, i)) return false;
-
-    return true;
+        e[i]->accept(*gen_);
 }
 
-boost::any is_constant_visitor::visit(function<base::variable> &) {
-    return false;
-}
-
-boost::any is_constant_visitor::visit(function<base::constant> &) {
-    return true;
+void is_constant_visitor::visit(function<base::variable> &) {
+    result = false;
 }
 
 }

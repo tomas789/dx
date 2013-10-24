@@ -32,6 +32,16 @@ namespace ex { namespace base {
     struct div : public function_base { static const std::size_t arity = 2; };
     struct pow : public function_base { static const std::size_t arity = 2; };
 
+    template <typename ... TList>
+    struct typelist { };
+
+    typedef typelist<
+            variable, constant,
+            sin, cos, tan, log,
+            add, sub, mul, div, pow
+        > symbols;
+
+
 
 } }
 

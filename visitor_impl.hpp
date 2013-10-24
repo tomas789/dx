@@ -2,6 +2,8 @@
 #define VISITOR_IMPL_HPP
 
 #include <string>
+#include <memory>
+#include <vector>
 
 #include "expr.hpp"
 #include "globals.hpp"
@@ -11,52 +13,86 @@
 
 namespace ex {
 
-class printer_visitor {
-    std::string recursive(ex::expr & e, std::size_t num);
+template <typename Visitor, typename Result>
+class visitor_base {
+protected:
+    Result result;
+    generic_visitor<Visitor> * gen_;
 
 public:
-    boost::any visit(ex::expr & e);
-    boost::any visit(ex::function<ex::base::variable> & c);
-    boost::any visit(ex::function<ex::base::constant> & c);
-    boost::any visit(ex::function<ex::base::sin> & c);
-    boost::any visit(ex::function<ex::base::cos> & c);
-    boost::any visit(ex::function<ex::base::tan> & c);
-    boost::any visit(ex::function<ex::base::log> & c);
-    boost::any visit(ex::function<ex::base::add> & c);
-    boost::any visit(ex::function<ex::base::sub> & c);
-    boost::any visit(ex::function<ex::base::mul> & c);
-    boost::any visit(ex::function<ex::base::div> & c);
-    boost::any visit(ex::function<ex::base::pow> & c);
+    void pass_generic(generic_visitor<Visitor> * v) {
+        gen_ = v;
+    }
+
+    Result get_result() const {
+        return result;
+    }
 };
 
-class eval_visitor {
-    const globals::valuation_type & v;
-    globals::eval_type recursive(ex::expr & e, std::size_t num);
+/**
+ * Make base_visitor_impl which will implement pass_generic and hold variable
+ */
 
+class printer_visitor : public visitor_base<printer_visitor, std::string> {
 public:
-    eval_visitor(const globals::valuation_type &);    
+    void visit(ex::expr & e);
+    void visit(ex::function<ex::base::variable> & c);
+    void visit(ex::function<ex::base::constant> & c);
+    void visit(ex::function<ex::base::sin> & c);
+    void visit(ex::function<ex::base::cos> & c);
+    void visit(ex::function<ex::base::tan> & c);
+    void visit(ex::function<ex::base::log> & c);
+    void visit(ex::function<ex::base::add> & c);
+    void visit(ex::function<ex::base::sub> & c);
+    void visit(ex::function<ex::base::mul> & c);
+    void visit(ex::function<ex::base::div> & c);
+    void visit(ex::function<ex::base::pow> & c);
+};
+
+class eval_visitor : public visitor_base<eval_visitor, double> {
+    const globals::valuation_type & v;
+public:
+    eval_visitor(const globals::valuation_type &);
     eval_visitor(const eval_visitor &);
 
-    boost::any visit(ex::expr & e);
-    boost::any visit(ex::function<ex::base::variable> & c);
-    boost::any visit(ex::function<ex::base::constant> & c);
-    boost::any visit(ex::function<ex::base::sin> & c);
-    boost::any visit(ex::function<ex::base::cos> & c);
-    boost::any visit(ex::function<ex::base::tan> & c);
-    boost::any visit(ex::function<ex::base::log> & c);
-    boost::any visit(ex::function<ex::base::add> & c);
-    boost::any visit(ex::function<ex::base::sub> & c);
-    boost::any visit(ex::function<ex::base::mul> & c);
-    boost::any visit(ex::function<ex::base::div> & c);
-    boost::any visit(ex::function<ex::base::pow> & c);
+    void visit(ex::expr & e);
+    void visit(ex::function<ex::base::variable> & c);
+    void visit(ex::function<ex::base::constant> & c);
+    void visit(ex::function<ex::base::sin> & c);
+    void visit(ex::function<ex::base::cos> & c);
+    void visit(ex::function<ex::base::tan> & c);
+    void visit(ex::function<ex::base::log> & c);
+    void visit(ex::function<ex::base::add> & c);
+    void visit(ex::function<ex::base::sub> & c);
+    void visit(ex::function<ex::base::mul> & c);
+    void visit(ex::function<ex::base::div> & c);
+    void visit(ex::function<ex::base::pow> & c);
 };
 
-class is_constant_visitor {
-    bool recursive(expr & e, std::size_t num);
+class flatten_visitor : public visitor_base<
+        flatten_visitor, 
+        std::vector<std::unique_ptr<expr> *>
+    > {
+    
 public:
-    boost::any visit(ex::expr & e);
-    boost::any visit(function<base::variable> &);
-    boost::any visit(function<base::constant> &);
+    void visit(ex::expr & e);
+    void visit(ex::function<ex::base::variable> & c);
+    void visit(ex::function<ex::base::constant> & c);
+    void visit(ex::function<ex::base::sin> & c);
+    void visit(ex::function<ex::base::cos> & c);
+    void visit(ex::function<ex::base::tan> & c);
+    void visit(ex::function<ex::base::log> & c);
+    void visit(ex::function<ex::base::add> & c);
+    void visit(ex::function<ex::base::sub> & c);
+    void visit(ex::function<ex::base::mul> & c);
+    void visit(ex::function<ex::base::div> & c);
+    void visit(ex::function<ex::base::pow> & c);
+};
+
+class is_constant_visitor : public visitor_base<is_constant_visitor, bool> {
+public:
+    void visit(ex::expr & e);
+    void visit(function<base::variable> &);
 };
 
 }
