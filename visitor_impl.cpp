@@ -7,79 +7,51 @@
 namespace ex {
 
 void printer_visitor::visit(ex::expr & e) {
-    result += "general_expression";
+    return_("general_expression");
 }
 
 void printer_visitor::visit(ex::function<ex::base::variable> & c) {
-    result += c.value;
+    return_(c.value);
 }
 
 void printer_visitor::visit(ex::function<ex::base::constant> & c) {
-    result += std::to_string(c.value);
+    return_(std::to_string(c.value));
 }
 
 void printer_visitor::visit(ex::function<ex::base::sin> & c) {
-    result += "sin(";
-    c[0]->accept(*gen_);
-    result += ")";
+    return_( "sin(" + recurse(c, 0) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::cos> & c) {
-    result += "cos(";
-    c[0]->accept(*gen_);
-    result += ")";
+    return_( "cos(" + recurse(c, 0) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::tan> & c) {
-    result += "tan(";
-    c[0]->accept(*gen_);
-    result += ")";
+    return_( "tan(" + recurse(c, 0) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::log> & c) {
-    result = "log(";
-    c[0]->accept(*gen_);
-    result += ")";
+    return_( "log(" + recurse(c, 0) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::add> & c) {
-    result += "(";
-    c[0]->accept(*gen_);
-    result += "+";
-    c[1]->accept(*gen_);
-    result += ")";
+    return_( "(" + recurse(c, 0) + "+" + recurse(c, 1) + "_" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::sub> & c) {
-    result += "(";
-    c[0]->accept(*gen_);
-    result += "-";
-    c[1]->accept(*gen_);
-    result += ")";
+    return_( "(" + recurse(c, 0) + "-" + recurse(c, 1) + "_" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::mul> & c) {
-    result += "(";
-    c[0]->accept(*gen_);
-    result += "*";
-    c[1]->accept(*gen_);
-    result += ")";
+    return_( "(" + recurse(c, 0) + "*" + recurse(c, 1) + "_" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::div> & c) {
-    result += "(";
-    c[0]->accept(*gen_);
-    result += "/";
-    c[1]->accept(*gen_);
-    result += ")";
+    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + "_" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::pow> & c) {
-    result += "(";
-    c[0]->accept(*gen_);
-    result += "^";
-    c[1]->accept(*gen_);
-    result += ")";
+    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + "_" );
 }
 
 eval_visitor::eval_visitor(const globals::valuation_type & v_)
@@ -89,75 +61,51 @@ eval_visitor::eval_visitor(const eval_visitor & e)
   : v(e.v) { }
 
 void eval_visitor::visit(expr & e) {
-    result = 0;
+    return_( 0 );
 }
 
 void eval_visitor::visit(function<base::variable> & c) {
-    result = v(c.value);
+    return_( v(c.value) );
 }
 
 void eval_visitor::visit(function<base::constant> & c) {
-    result = c.value;
+    return_( c.value );
 }
 
 void eval_visitor::visit(function<base::sin> & c) {
-    c[0]->accept(*gen_);
-    result = std::sin(result);
+    return_( std::sin(recurse(c, 0)) );
 }
 
 void eval_visitor::visit(function<base::cos> & c) {
-    c[0]->accept(*gen_);
-    result = std::cos(result);
+    return_( std::cos(recurse(c, 0)) );
 }
 
 void eval_visitor::visit(function<base::tan> & c) {
-    c[0]->accept(*gen_);
-    result = std::tan(result);
+    return_( std::tan(recurse(c, 0)) );
 }
 
 void eval_visitor::visit(function<base::log> & c) {
-    c[0]->accept(*gen_);
-    result = std::log(result);
+    return_( std::log(recurse(c, 0)) );
 }
 
 void eval_visitor::visit(function<base::add> & c) {
-    c[0]->accept(*gen_);
-    double lhs = result;
-    c[1]->accept(*gen_);
-    double rhs = result;
-    result = lhs + rhs;
+    return_( recurse(c, 0) + recurse(c, 1) );
 }
 
 void eval_visitor::visit(function<base::sub> & c) {
-    c[0]->accept(*gen_);
-    double lhs = result;
-    c[1]->accept(*gen_);
-    double rhs = result;
-    result = lhs - rhs;
+    return_( recurse(c, 0) - recurse(c, 1) );
 }
 
 void eval_visitor::visit(function<base::mul> & c) {
-    c[0]->accept(*gen_);
-    double lhs = result;
-    c[1]->accept(*gen_);
-    double rhs = result;
-    result = lhs * rhs;
+    return_( recurse(c, 0) * recurse(c, 1) );
 }
 
 void eval_visitor::visit(function<base::div> & c) {
-    c[0]->accept(*gen_);
-    double lhs = result;
-    c[1]->accept(*gen_);
-    double rhs = result;
-    result = lhs / rhs;
+    return_( recurse(c, 0) / recurse(c, 1) );
 }
 
 void eval_visitor::visit(function<base::pow> & c) {
-    c[0]->accept(*gen_);
-    double lhs = result;
-    c[1]->accept(*gen_);
-    double rhs = result;
-    result = std::pow(lhs, rhs);
+    return_( std::pow(recurse(c, 0), recurse(c, 1)) );
 }
 
 void is_constant_visitor::visit(ex::expr & e) {

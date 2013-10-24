@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "expr.hpp"
+#include "expression.hpp"
 #include "globals.hpp"
 #include "visitor.hpp"
 #include "function_base.hpp"
@@ -27,11 +28,19 @@ public:
     Result get_result() const {
         return result;
     }
-};
 
-/**
- * Make base_visitor_impl which will implement pass_generic and hold variable
- */
+    Result recurse(ex::expr & e, std::size_t n) {
+        Result tmp;
+        std::swap(result, tmp);
+        e[n]->accept(*gen_);
+        std::swap(result, tmp);
+        return tmp;
+    }
+
+    void return_(Result r) {
+        result = r;
+    }
+};
 
 class printer_visitor : public visitor_base<printer_visitor, std::string> {
 public:
