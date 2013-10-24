@@ -6,7 +6,6 @@
  */
 
 #include <functional>
-#include <boost/any.hpp>
 
 #include "globals.hpp"
 

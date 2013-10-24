@@ -14,6 +14,12 @@
 
 namespace ex {
 
+/**
+ * Adds basic functionality to the Visitor implementation so
+ * derived classes can use recursion on the tree and simple
+ * way to return value even when visitor does not support
+ * this functionality without things like boost::any at all.
+ */
 template <typename Visitor, typename Result>
 class visitor_base {
 protected:
