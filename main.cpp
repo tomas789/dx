@@ -10,7 +10,7 @@
 #include <thread>
 
 #include "genetics.hpp"
-
+#include "matchers.hpp"
 
 
 int main(int argc, char ** argv) {
