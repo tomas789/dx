@@ -20,7 +20,7 @@ T random_between(T begin, T end) {
             std::uniform_real_distribution<T>
         >::type distrib(begin, end);
 
-    auto engine = make_random_engine();
+    auto& engine = make_random_engine();
     
     return distrib(engine);
 }
@@ -28,7 +28,7 @@ T random_between(T begin, T end) {
 template <typename T>
 T random_normal(T mean, T stddev) {
     std::normal_distribution<T> distrib(mean, stddev);
-    auto engine = make_random_engine();
+    auto& engine = make_random_engine();
     return distrib(engine);
 }
 
