@@ -11,6 +11,10 @@
 #include "visitor.hpp"
 #include "visitor_impl.hpp"
 
+std::unique_ptr<ex::expr>  make_random_impl(
+        const std::vector<std::string> & vars,
+        std::size_t depth);
+
 std::vector<std::unique_ptr<ex::expr> *> individual::linearize() const {
     std::vector<std::unique_ptr<ex::expr> * > v;
     std::stack<std::unique_ptr<ex::expr> * > queue;
@@ -26,13 +30,6 @@ std::vector<std::unique_ptr<ex::expr> *> individual::linearize() const {
             auto & v = (*n)->operator[] (i);
             queue.push(&v);
         }
-    }
-
-    for (auto it = v.begin(); it != v.end(); ++it) {
-        std::cout << it - v.begin() << " : ";
-        ex::generic_visitor<ex::printer_visitor> v;
-        (**it)->accept(v);
-        std::cout << v->get_result() << std::endl;
     }
 
     return v;
@@ -63,12 +60,39 @@ individual & individual::operator= (individual && i) noexcept {
 }
 
 individual individual::crossover(const individual & i) const {
-    std::vector<std::unique_ptr<ex::expr> * > lin_lhs = linearize();
-    std::vector<std::unique_ptr<ex::expr> * > lin_rhs = linearize();
+    individual this_copy(*this);
+
+    std::unique_ptr<ex::expr> * swap_lhs;
+    std::unique_ptr<ex::expr> * swap_rhs;
+
+    {
+        std::vector<std::unique_ptr<ex::expr> * > lin_lhs = this_copy.linearize();
+        swap_lhs = lin_lhs[random_between((std::size_t)0, lin_lhs.size() - 1)];
+    }
+
+    {
+        std::vector<std::unique_ptr<ex::expr> * > lin_rhs = i.linearize();
+        swap_rhs = lin_rhs[random_between((std::size_t)0, lin_rhs.size() - 1)];
+    }
+    
+    std::unique_ptr<ex::expr> replacement = (*swap_rhs)->clone();
+    std::swap(*swap_lhs, replacement);
+
+    return this_copy;
 }
 
 individual individual::mutate() const {
+    individual new_individual(*this);
+    std::unique_ptr<ex::expr> * subtree;
+    
+    {
+        std::vector<std::unique_ptr<ex::expr> * > lin_rhs = new_individual.linearize();
+        subtree = lin_rhs[random_between((std::size_t)0, lin_rhs.size() - 1)];
+    }
 
+    subtree->reset(new ex::function<ex::base::constant>(random_normal(0.0, 1.0)));
+
+    return new_individual;
 }
 
 std::ostream & operator<< (std::ostream & out, const individual & i) {
@@ -76,10 +100,6 @@ std::ostream & operator<< (std::ostream & out, const individual & i) {
     i.c->accept(v);
     return out << v->get_result();
 }
-
-std::unique_ptr<ex::expr>  make_random_impl(
-        const std::vector<std::string> & vars,
-        std::size_t depth);
 
 std::unique_ptr<ex::expr> make_inner(
         const std::vector<std::string> & vars,
@@ -117,7 +137,7 @@ std::unique_ptr<ex::expr> make_leave(const std::vector<std::string> & vars) {
 std::unique_ptr<ex::expr>  make_random_impl(
         const std::vector<std::string> & vars,
         std::size_t depth) {
-    if (depth > 0) return std::move(make_inner(vars, depth - 1));
+    if (depth > 0) return std::move(make_inner(vars, depth));
     else return std::move(make_leave(vars));
 }
 
