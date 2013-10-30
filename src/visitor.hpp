@@ -6,6 +6,13 @@
 
 namespace ex {
 
+/** \brief Common super-class for every visitor
+ *
+ *  There have to be listed overloaded \ref visit method for every function user
+ *  as template parameter of \ref ex::function 
+ *
+ *  \todo Use Loki-style visitor generated from typelist.
+ */
 struct abstract_visitor {
     virtual void visit(function<base::variable> & c) = 0;
     virtual void visit(function<base::constant> & c) = 0;
@@ -20,8 +27,20 @@ struct abstract_visitor {
     virtual void visit(function<base::pow> & c) = 0;
 };
 
+/** \brief Real type of every visitor.
+ *
+ *  There have to be listed overloaded \ref visit method for every function used
+ *  as template parameter of \ref ex::function
+ *
+ *  Thanks to this visitor don't have to have virtual visit functions. 
+ *
+ *  \tparam U visitor type
+ *
+ *  \todo Use Loki-style visitor generated from typelist.
+ */
 template <typename U>
 class generic_visitor : public abstract_visitor {
+    /** \brief visitor instance */
     U u;
 public:
     generic_visitor() {
@@ -76,6 +95,7 @@ public:
         u.visit(c);
     }
 
+    /** \brief Access visitor */
     U* operator-> () {
         return &u;
     }
