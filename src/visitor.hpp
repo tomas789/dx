@@ -1,8 +1,6 @@
 #ifndef VISITOR_HPP
 #define VISITOR_HPP
 
-#include <boost/any.hpp>
-
 #include "function_base.hpp"
 #include "function_forward.hpp"
 

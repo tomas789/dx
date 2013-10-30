@@ -1,7 +1,5 @@
 #include "visitor_impl.hpp"
 
-#include <boost/lexical_cast.hpp>
-
 #include "function.hpp"
 
 namespace ex {
