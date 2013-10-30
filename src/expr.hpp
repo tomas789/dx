@@ -6,7 +6,7 @@
  */
 
 #include <functional>
-#include <boost/any.hpp>
+#include <memory>
 
 #include "globals.hpp"
 
@@ -27,7 +27,7 @@ public:
 
     /* It might be better to use policy class instead */
     //using ptr_type = std::unique_ptr<expr>;
-    typedef expression ptr_type;
+    typedef std::unique_ptr<expr> ptr_type;
     typedef std::string string_type;
     typedef double eval_type;
     typedef std::function<eval_type(string_type)> valuation_type;
