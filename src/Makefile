@@ -1,5 +1,5 @@
 CXXFLAGS += -ggdb -Wall -pedantic -std=c++11 -Wno-tautological-compare -O0
-SOURCES = exparser.cpp expression.cpp main.cpp visitor_impl.cpp genetics.cpp
+SOURCES = main.cpp visitor_impl.cpp individual.cpp random.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = dx
 

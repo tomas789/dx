@@ -9,13 +9,15 @@
 #include <mutex>
 #include <thread>
 
-#include "genetics.hpp"
+#include "individual.hpp"
 
 
 
 int main(int argc, char ** argv) {
-    genetics g;
-    g.island();
+    std::vector<std::string> vars = { "x" };
+
+    individual lhs = make_random(vars, 2);
+    std::cout << lhs << std::endl;
 
     return 0;
 }
