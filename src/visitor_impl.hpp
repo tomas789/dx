@@ -14,14 +14,21 @@
 
 namespace ex {
 
-/**
- * Adds basic functionality to the Visitor implementation so
- * derived classes can use recursion on the tree and simple
- * way to return value even when visitor does not support
- * this functionality without things like boost::any at all.
+/** \brief No purpose yet */
+class visitor_common { };
+
+/** \brief Common base for every visitor supplying base functionality for them
+ *
+ *  Deriving from this is optional but recommanded especially for recursive
+ *  visitors.
+ *
+ *  \tparam Visitor visitor type
+ *  \tparam Result return type of visitor
+ *
+ *  \todo Result should be defaulted to void. (Is it good idea?)
  */
 template <typename Visitor, typename Result>
-class visitor_base {
+class visitor_base : public visitor_common {
 protected:
     Result result;
     generic_visitor<Visitor> * gen_;
@@ -31,10 +38,16 @@ public:
         gen_ = v;
     }
 
+    /** \brief Obtain value generated from visitor
+     *
+     *  If called before visitor did return_( ... ) default value for
+     *  result type is returned.
+     */
     Result get_result() const {
         return result;
     }
 
+    /** \brief Call visitor to nth child of node e */
     Result recurse(ex::expr & e, std::size_t n) {
         Result tmp;
         std::swap(result, tmp);
@@ -43,6 +56,7 @@ public:
         return tmp;
     }
 
+    /** \brief Return value from visitor */
     void return_(Result r) {
         result = r;
     }
@@ -64,6 +78,7 @@ public:
     void visit(ex::function<ex::base::pow> & c);
 };
 
+/** \brief Evaluate tree for given valuation */
 class eval_visitor : public visitor_base<eval_visitor, double> {
     const globals::valuation_type & v;
 public:
@@ -84,6 +99,13 @@ public:
     void visit(ex::function<ex::base::pow> & c);
 };
 
+/** \brief UNUSED Semantically incorrect visitor
+ *
+ *  It should be removed. It is left here to remember not to 
+ *  repeat the same mistake. You cannot linearize tree by 
+ *  visiting it because you cannot guarantee it returns array
+ *  of !unique! references to nodes.
+ */
 class flatten_visitor : public visitor_base<
         flatten_visitor, 
         std::vector<std::unique_ptr<expr> *>
@@ -104,6 +126,7 @@ public:
     void visit(ex::function<ex::base::pow> & c);
 };
 
+/** \brief True iff no leave is variable not matter the name is */
 class is_constant_visitor : public visitor_base<is_constant_visitor, bool> {
 public:
     void visit(ex::expr & e);

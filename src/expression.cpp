@@ -1,5 +1,3 @@
-#include <boost/any.hpp>
-
 #include "expression.hpp"
 
 #include "visitor.hpp"

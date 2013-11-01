@@ -6,6 +6,7 @@
  */
 
 #include <functional>
+#include <memory>
 
 #include "globals.hpp"
 
@@ -15,28 +16,40 @@ namespace ex {
 
 struct abstract_visitor;
 
-/**
- * Virtual super-class for expression tree
+/** \brief Virtual super-class for expression tree
  *
- * All important types and functions for outside users are 
- * defined here.
+ *  All important types and functions for outside users are 
+ *  defined here.
  */
 class expr {
 public:
 
     /* It might be better to use policy class instead */
     //using ptr_type = std::unique_ptr<expr>;
-    typedef expression ptr_type;
+    typedef std::unique_ptr<expr> ptr_type;
     typedef std::string string_type;
     typedef double eval_type;
     typedef std::function<eval_type(string_type)> valuation_type;
     typedef std::size_t size_type;
 
+    /** \brief Virtual copy-constructor
+     *
+     *  Return deep copy of this tree
+     */
     virtual ptr_type clone() = 0;
-    
+   
+    /** \brief Arity of root node of this tree
+     */
     virtual size_type arity() = 0;
+
+    /** \brief nth child of root node of this tree
+     */
     virtual ptr_type & operator[] (size_type n) = 0;
 
+    /** \brief Accept visitor
+     *
+     *  This is accepting function for visitor pattern.
+     */
     virtual void accept(abstract_visitor & v) = 0;
 };
 

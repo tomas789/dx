@@ -1,7 +1,5 @@
 #include "visitor_impl.hpp"
 
-#include <boost/lexical_cast.hpp>
-
 #include "function.hpp"
 
 namespace ex {
@@ -35,23 +33,23 @@ void printer_visitor::visit(ex::function<ex::base::log> & c) {
 }
 
 void printer_visitor::visit(ex::function<ex::base::add> & c) {
-    return_( "(" + recurse(c, 0) + "+" + recurse(c, 1) + "_" );
+    return_( "(" + recurse(c, 0) + "+" + recurse(c, 1) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::sub> & c) {
-    return_( "(" + recurse(c, 0) + "-" + recurse(c, 1) + "_" );
+    return_( "(" + recurse(c, 0) + "-" + recurse(c, 1) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::mul> & c) {
-    return_( "(" + recurse(c, 0) + "*" + recurse(c, 1) + "_" );
+    return_( "(" + recurse(c, 0) + "*" + recurse(c, 1) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::div> & c) {
-    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + "_" );
+    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + ")" );
 }
 
 void printer_visitor::visit(ex::function<ex::base::pow> & c) {
-    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + "_" );
+    return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + ")" );
 }
 
 eval_visitor::eval_visitor(const globals::valuation_type & v_)

@@ -18,19 +18,14 @@
 
 namespace ex {
 
-/**
- * Function class with all functionality
+/** \brief Function class with all functionality
  * 
- * Template parameter must be derived from function_base class - this makes
- * more human-readable compiler errors when invalid template parameter is
- * supplied.
+ *  Template parameter must be derived from function_base class - this makes
+ *  more human-readable compiler errors when invalid template parameter is
+ *  supplied.
  *
- * TODO : Conditionally derive from n_ary only when T::arity != 0 (?)
- * TODO : Leverage generic design and make generic to_string and eval
+ *  \tparam T class derived from \ref ex::base::function_base
  */
-//template <class T, class Enable = void>
-//class function;
-
 template <class T>
 class function<
     T, 
@@ -43,24 +38,18 @@ class function<
 >
   : public T, public n_ary<T::arity> {
 public:
-    /**
-     * Constructor for functions with internal value
-     * Defined only for functions with value_type type
+    /** \brief Default do-nothing constructor 
      *
-     * TODO : Is possible to simply pass more then one parameter
-     *        without additional encapsulation (pair, tuple, vector, ...)?
-     * TODO : define template <class T> function<T>::operator std::string();
+     *  This should never be used (really?)
      */
-    
-    /**
-     * Parameterless constructor 
-     */
-    function() {
-    }
+    function() { }
 
-    /**
-     * Construct using value
-     * Fro nullary functions only (T::arity == 0)
+    /** \brief Construct using value
+     * 
+     *  This method is defined for nullary functions 
+     *  only (T::arity == 0)
+     *
+     *  \param v value of this node
      */
     template <
             typename U = T, 
@@ -72,9 +61,15 @@ public:
         U::value = v; 
     }
 
-    /**
-     * Initialize using childrens
-     * For non-terminals only (T::arity != 0)
+    /** \brief Initialize using childrens
+     * 
+     *  Thid method is defined for non-terminals only (T::arity != 0)
+     *
+     *  Number of parameters have to by same as arity of this node.
+     *  Trees will be used as childrend in the same order they was passed
+     *  to this constructor.
+     *
+     *  \param tlist unique trees to be used as childs of this node
      */
     template<
             typename... Tree, 
@@ -87,28 +82,26 @@ public:
         n_ary<T::arity>::move_to(std::move(tlist)...);
     }
 
-    /** 
-     * Copy constructor 
-     */
+    /** \brief Copy constructor */
     explicit function(const function<T>& a) : T(static_cast<T>(a)) { 
         for (std::size_t i = 0; i < T::arity; ++i)
             n_ary<T::arity>::childs[i] = std::move(a.childs[i]->clone());
     };
 
-    /**
-     * Implicit type cast to tree_type
-     */
+    /** \brief Implicit type cast to \ref ex::expr::ptr_type */
     operator expr::ptr_type() const { 
         return ptr_type(this); 
     }
 
-    /**
-     * Virtual copy constructor using actual copy constructor
+    /** \brief Virtual copy constructor implementation
+     *
+     *  This is using "real" copy-constructor to deep copy this tree
      */
     expr::ptr_type clone() {
         return expr::ptr_type(new function<T>(*this));
     }
 
+    /** /brief Visitor pattern's acceptor implementation */
     void accept(abstract_visitor & v) {
         return v.visit(*this);
     }

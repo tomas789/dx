@@ -1,29 +1,10 @@
-CXXFLAGS += -ggdb -Wall -pedantic -std=c++11 -Wno-tautological-compare -O0
-SOURCES = exparser.cpp expression.cpp main.cpp visitor_impl.cpp genetics.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = dx
+all : binary test doc
 
-.PHONY: all clean distclean
+binary :
+	$(MAKE) -C src
 
-clean_list = $(OBJECTS) $(EXECUTABLE)
+doc :
+	$(MAKE) -C doc
 
-all: $(EXECUTABLE)
-
-clean: 
-	$(RM) -rf $(clean_list)
-
-distclean: clean
-
-clean_list += ${SOURCES:.cpp=.d}
-
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c $<
-
-$(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(EXECUTABLE)
-
-%.d: $(SOURCES)
-	$(CXX) $(CXXFLAGS) -MM $? > $@
-
--include ${SOURCES:.cpp=.d}
-
+test : 
+	$(MAKE) -C test

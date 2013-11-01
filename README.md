@@ -1,18 +1,14 @@
-DX - Symbolic Derivation Toolbox
+DX - Genetic Programming Toolbox
 ================================
 
-DX is small program used for symbolic derivation of given math expression.
+DX is toolbox for simple genetic programming tasks.
 
-It is written in C++ and leverages from use of C++11. Main goal is to provide simple
-yet powerful tool for symbolic derivation. It is proof-of-concept and will in the 
-future transform to Genetic Programming library.
+It is written in C++ and leverages from use of C++11. Main goal is to provide simple yet powerful tool for genetic programming representing each individual as interpreted computer program.
 
-Comtributors
+Contributors
 ------------
 
-* Tomas Krejci
-  * Charles University in Prague, Czech Republic
-  * tomas789 -at- gmail -dot- com
+* [Tomas Krejci](mailto:tomas789@gmail.com) , [Charles University in Prague, Czech Republic](http://www.cuni.cz/UKEN-1.html)
 
 How To Install
 --------------
@@ -20,9 +16,7 @@ How To Install
 It is shipped with `Makefile` which is tested with GNU Make 3.81. To compile
 program simply call
 
-```bash
-make
-```
+    make
 
 It will compile and produce executable `dx` which can be then used without
 further restrictions and no dynamic dependencies.
@@ -48,38 +42,3 @@ Some tested compilers are:
 
 Microsoft Visual C++ is currently NOT supported.
 
-Workflow
---------
-
- 1/ Read expression from standard input (stdin).
- 
- 2/ Pass expression as an argument to the function 
-        `expression parse(const std::string &)`
- 
- 3/ Result of `parse` function is AST of given expression
-
- 4/ Call function expression 
-        `expression::derive(const std::string &)`
-
- 5/ Print result to standard output (stdout)
-
-
-Internals
----------
-
-### Parser
-
-As a parser there is used [Recursice Descent parsing](http://en.wikipedia.org/wiki/Recursive_descent_parser). Whole parser code is defined in class exparser (defined in exparser.hpp and implemented exparser.cpp).
-
-It loops through set of possible variant and try to match given input to parser definition. It returns tuple of bool (was parsing successful) and value of parsed input - object of expression type.
-
-### Expression Representation
-### Expression class functionality
-### How to extend library
-
-TODO
-----
-
-### Support for GP (genetic programming)
-### Extendability
-### Symbol traits

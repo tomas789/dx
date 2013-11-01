@@ -8,10 +8,16 @@
 
 #include "expression.hpp"
 
+/** \brief Parse given string and build syntax tree from it
+ *
+ *  \todo Remove dependency on boost::optional. It is proposed
+ *        to replace it with std::optional.
+ */
 class exparser {
 public:
     typedef boost::optional<expression> return_type;
 
+    /** \brief Suppress debug messages during parsing? */
     static const bool debug = false;
 
 private:
