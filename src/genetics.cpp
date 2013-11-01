@@ -1,5 +1,16 @@
 #include "genetics.hpp"
 
+individual::subpop random_subpopulation(std::size_t size) {
+    double p = (double) size / p.size();
+    auto subpop = p.subpopulation();
+    
+    for (std::size_t i = 0; i < p.size(); ++i)
+        if (random_alternative(p))
+            subpop.include(i);
+
+    return subpop;
+}
+
 bool genetics::compare_individuals(const individual & lhs, const individual & rhs) const {
     return fitness(lhs) < fitness(rhs);
 }
