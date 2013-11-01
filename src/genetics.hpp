@@ -16,6 +16,7 @@ class genetics {
     std::function<double(individual)> fitness;
 
     population c;
+    individual::subpop random_subpopulation(std::size_t size);
 
     bool compare_individuals(const individual & lhs, const individual & rhs) const;
     void initialize_population();
