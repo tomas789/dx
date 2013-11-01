@@ -1,5 +1,7 @@
 #include "visitor_impl.hpp"
 
+#include <functional>
+
 #include "function.hpp"
 
 namespace ex {
@@ -113,6 +115,24 @@ void is_constant_visitor::visit(ex::expr & e) {
 
 void is_constant_visitor::visit(function<base::variable> &) {
     result = false;
+}
+
+void hash_visitor::visit(expr & e) {
+    std::size_t h = typeid(e).hash_code();
+    for (std::size_t i = 0; i < e.arity(); ++i)
+        h ^= recurse(e, i);
+
+    return_( h );
+}
+
+void hash_visitor::visit(ex::function<base::variable> & e) {
+    std::hash<decltype(e.value)> h;
+    return_( h(e.value) );
+}
+
+void hash_visitor::visit(ex::function<base::constant> & e) {
+    std::hash<decltype(e.value)> h;
+    return_( h(e.value) );
 }
 
 }
