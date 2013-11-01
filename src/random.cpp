@@ -6,4 +6,9 @@ std::mt19937 & make_random_engine() {
     return gen;
 }
 
+bool random_alternative(double p) {
+    std::bernoulli_distribution distrib(p);
+    auto& engine = make_random_engine();
+    return distrib(engine);
+}
 

@@ -69,4 +69,6 @@ T random_normal(T mean, T stddev) {
     return distrib(engine);
 }
 
+bool random_alternative(double p);
+
 #endif
