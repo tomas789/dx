@@ -9,7 +9,7 @@
 
 namespace ex {
 
-/** \briefChild (subtree) container.
+/** \brief Child (subtree) container.
  *
  *  \tparam Arity Arity of this node
  */

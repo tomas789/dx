@@ -14,6 +14,9 @@
 
 namespace ex {
 
+/** \brief No purpose yet */
+class visitor_common { };
+
 /** \brief Common base for every visitor supplying base functionality for them
  *
  *  Deriving from this is optional but recommanded especially for recursive
@@ -25,7 +28,7 @@ namespace ex {
  *  \todo Result should be defaulted to void. (Is it good idea?)
  */
 template <typename Visitor, typename Result>
-class visitor_base {
+class visitor_base : public visitor_common {
 protected:
     Result result;
     generic_visitor<Visitor> * gen_;
