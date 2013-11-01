@@ -1,39 +1,29 @@
 #ifndef _GENETICS_HPP
 #define _GENETICS_HPP
 
-#include <random>
-#include <mutex>
-#include <vector>
-#include <thread>
+#include <functional>
 
-#include "expression.hpp"
+#include "individual.hpp"
+#include "population.hpp"
 
 class genetics {
-public:
-    typedef std::pair<double, expression> individual_type;
+    std::size_t population_size = 50;
+    std::size_t max_generations = 50;
 
-private:
-    static std::random_device rd_;
-    static std::mt19937 gen_;
+    std::size_t initial_individual_depth = 3;
 
-    double target(double x);
+    std::vector<std::string> vars;
+    std::function<double(individual)> fitness;
 
-    typedef std::pair<std::thread::id, individual_type> foreigner_type;
-    std::mutex foreigners_lock_;
-    std::vector<foreigner_type> foreigners_;
+    population c;
 
-    std::size_t max_foreigners_ = 20;
-    individual_type get_foreigner();
+    bool compare_individuals(const individual & lhs, const individual & rhs) const;
+    void initialize_population();
 
 public:
-    genetics() = default;
+    genetics & set_fitness(std::function<double(individual)> f);
 
-    double least_squares(double from, double to, std::size_t pts, 
-                         std::function<double(double)> f);
-
-    expression random(const std::vector<std::string> & vars, std::size_t depth);
-
-    void island();
+    void run();
 };
 
 #endif
