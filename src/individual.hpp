@@ -97,6 +97,10 @@ public:
      */
     individual mutate() const;
 
+    std::size_t hash() const;
+
+    double eval(std::function<double(std::string)> vals) const;
+
     friend std::ostream & operator<< (std::ostream & out, const individual & i);  
 };
 

@@ -95,6 +95,19 @@ individual individual::mutate() const {
     return new_individual;
 }
 
+std::size_t individual::hash() const {
+    ex::generic_visitor<ex::hash_visitor> v;
+    c->accept(v);
+    return v->get_result();
+}
+
+double individual::eval(std::function<double(std::string)> vals) const {
+    ex::eval_visitor v_impl(vals);
+    ex::generic_visitor<ex::eval_visitor> v(v_impl);
+    c->accept(v);
+    return v->get_result();
+}
+
 std::ostream & operator<< (std::ostream & out, const individual & i) {
     ex::generic_visitor<ex::printer_visitor> v;
     i.c->accept(v);

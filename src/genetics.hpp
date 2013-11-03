@@ -2,6 +2,8 @@
 #define _GENETICS_HPP
 
 #include <functional>
+#include <map>
+#include <type_traits>
 
 #include "individual.hpp"
 #include "population.hpp"
@@ -16,9 +18,11 @@ class genetics {
     std::function<double(individual)> fitness;
 
     population c;
-    individual::subpop random_subpopulation(std::size_t size);
+    population::subpop random_subpopulation(std::size_t size);
+    std::map<std::size_t, double> cache;
 
-    bool compare_individuals(const individual & lhs, const individual & rhs) const;
+    double get_fitness(const individual & i);
+    bool compare_individuals(const individual & lhs, const individual & rhs);
     void initialize_population();
 
 public:
