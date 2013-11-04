@@ -8,3 +8,5 @@ doc :
 
 test : 
 	$(MAKE) -C test
+
+.PHONY = binary doc test

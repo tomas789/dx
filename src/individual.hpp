@@ -97,8 +97,18 @@ public:
      */
     individual mutate() const;
 
+    /** \brief Hash of this individual
+     *
+     *  Probability of two different individuals having same hash is close to
+     *  `1 / std::numeris_limits<std::size_t>::max()`.
+     */
     std::size_t hash() const;
 
+    /** \brief Evaluate this individual for given valuation
+     *
+     *  Valuation is function from set of variables to eval_type. It is typically
+     *  function `f` such as `f : std::size_t -> double`
+     */
     double eval(std::function<double(std::string)> vals) const;
 
     friend std::ostream & operator<< (std::ostream & out, const individual & i);  
@@ -111,9 +121,13 @@ public:
 std::ostream & operator<< (std::ostream & out, const individual & i);
 
 
-/** \brief Make random individual using supplied variables */
+/** \brief Make random individual using supplied variables
+ *
+ *  \todo Consider moving of this function to header `random.hpp`
+ */
 individual make_random(
         const std::vector<std::string> & vars, 
-        std::size_t depth = 0);
+        std::size_t depth = 0
+    );
 
 #endif
