@@ -52,6 +52,54 @@ void printer_visitor::visit(ex::function<ex::base::pow> & c) {
     return_( "(" + recurse(c, 0) + "/" + recurse(c, 1) + ")" );
 }
 
+void latex_visitor::visit(ex::expr & e) {
+    return_("general_expression");
+}
+
+void latex_visitor::visit(ex::function<ex::base::variable> & c) {
+    return_(c.value);
+}
+
+void latex_visitor::visit(ex::function<ex::base::constant> & c) {
+    return_(std::to_string(c.value));
+}
+
+void latex_visitor::visit(ex::function<ex::base::sin> & c) {
+    return_( "\\sin \\left( " + recurse(c, 0) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::cos> & c) {
+    return_( "\\cos \\left( " + recurse(c, 0) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::tan> & c) {
+    return_( "\\tan \\left( " + recurse(c, 0) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::log> & c) {
+    return_( "\\log \\left( " + recurse(c, 0) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::add> & c) {
+    return_( "\\left( " + recurse(c, 0) + "+" + recurse(c, 1) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::sub> & c) {
+    return_( "\\left( " + recurse(c, 0) + "-" + recurse(c, 1) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::mul> & c) {
+    return_( "\\left( " + recurse(c, 0) + "*" + recurse(c, 1) + " \\right)" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::div> & c) {
+    return_( "\\frac{ " + recurse(c, 0) + "}{" + recurse(c, 1) + " }" );
+}
+
+void latex_visitor::visit(ex::function<ex::base::pow> & c) {
+    return_( "\\left( " + recurse(c, 0) + "/" + recurse(c, 1) + " \\right)" );
+}
+
 eval_visitor::eval_visitor(const globals::valuation_type & v_)
   : v(v_) { }
 

@@ -78,6 +78,22 @@ public:
     void visit(ex::function<ex::base::pow> & c);
 };
 
+class latex_visitor : public visitor_base<latex_visitor, std::string> {
+public:
+    void visit(ex::expr & e);
+    void visit(ex::function<ex::base::variable> & c);
+    void visit(ex::function<ex::base::constant> & c);
+    void visit(ex::function<ex::base::sin> & c);
+    void visit(ex::function<ex::base::cos> & c);
+    void visit(ex::function<ex::base::tan> & c);
+    void visit(ex::function<ex::base::log> & c);
+    void visit(ex::function<ex::base::add> & c);
+    void visit(ex::function<ex::base::sub> & c);
+    void visit(ex::function<ex::base::mul> & c);
+    void visit(ex::function<ex::base::div> & c);
+    void visit(ex::function<ex::base::pow> & c);
+};
+
 /** \brief Evaluate tree for given valuation */
 class eval_visitor : public visitor_base<eval_visitor, double> {
     const globals::valuation_type & v;

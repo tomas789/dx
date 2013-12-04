@@ -96,7 +96,7 @@ individual individual::mutate() const {
 }
 
 std::ostream & operator<< (std::ostream & out, const individual & i) {
-    ex::generic_visitor<ex::printer_visitor> v;
+    ex::generic_visitor<ex::latex_visitor> v;
     i.c->accept(v);
     return out << v->get_result();
 }
@@ -106,11 +106,19 @@ std::unique_ptr<ex::expr> make_inner(
         std::size_t depth) {
     auto rec = [&] { return make_random_impl(vars, depth - 1); };
 
-    switch (random_between(0, 1)) {
+    switch (random_between(0, 5)) {
         case 0:
             return std::unique_ptr<ex::expr>(new ex::function<ex::base::add>(rec(), rec()));
         case 1:
             return std::unique_ptr<ex::expr>(new ex::function<ex::base::sub>(rec(), rec()));
+        case 2:
+            return std::unique_ptr<ex::expr>(new ex::function<ex::base::mul>(rec(), rec()));
+        case 3:
+            return std::unique_ptr<ex::expr>(new ex::function<ex::base::div>(rec(), rec()));
+        case 4:
+            return std::unique_ptr<ex::expr>(new ex::function<ex::base::sin>(rec()));
+        case 5:
+            return std::unique_ptr<ex::expr>(new ex::function<ex::base::cos>(rec()));
     }
 
     return nullptr;
@@ -134,7 +142,7 @@ std::unique_ptr<ex::expr> make_leave(const std::vector<std::string> & vars) {
     return nullptr;
 }
 
-std::unique_ptr<ex::expr>  make_random_impl(
+std::unique_ptr<ex::expr> make_random_impl(
         const std::vector<std::string> & vars,
         std::size_t depth) {
     if (depth > 0) return std::move(make_inner(vars, depth));
