@@ -43,14 +43,29 @@ public:
     };
 
 protected:
+    /** \brief Population container. */
     container c;
 
 public:
-    /** /brief Empty population */
+    /** \brief Empty population */
     population();
 
+    /** \brief Initialize population by different instance of this class
+     *
+     *  Every individual is copyed using its copy-constructor
+     */
     population(const population & p);
+
+    /** \brief Inidialize population by different instance of this class
+     *
+     * Every individual is moved using its move-constructor
+     */
     population(population && p);
+
+    /** \brief Initialize population by subpopulation of different population
+     *
+     *  Every individual is copyed using its copy-constructor.
+     */
     population(const subpop & s);
 
     population & operator= (const population & p);
@@ -85,9 +100,19 @@ public:
     const_iterator cbegin() const;
     const_iterator cend() const;
 
+    /** \brief Reserve space for `n` individuals */
     void reserve(std::size_t n);
 
+    /** \brief Add individual to population
+     *
+     *  Copy-constructor of supplied individual will be used
+     */
     void push_back(const value_type & value);
+
+    /** \brief Add individual to population
+     *
+     *  Move-constructor of supplied individual will be used
+     */
     void push_back(value_type && value);
 };
 

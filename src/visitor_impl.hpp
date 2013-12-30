@@ -149,6 +149,15 @@ public:
     void visit(function<base::variable> &);
 };
 
+/** \brief Generate hash for given tree */
+class hash_visitor : public visitor_base<hash_visitor, std::size_t> {
+public:
+    void visit(expr & e);
+    void visit(ex::function<base::variable> & e);
+    void visit(ex::function<base::constant> & e);
+
+};
+
 }
 
 #endif
