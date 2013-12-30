@@ -8,7 +8,7 @@ struct globals {
     typedef double eval_type;
     typedef std::size_t size_type;
 
-    typedef std::function<eval_type(string_type)> valuation_type; 
+    typedef std::function<eval_type(size_type)> valuation_type; 
 };
 
 #endif

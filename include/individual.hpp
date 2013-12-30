@@ -109,7 +109,7 @@ public:
      *  Valuation is function from set of variables to eval_type. It is typically
      *  function `f` such as `f : std::size_t -> double`
      */
-    double eval(std::function<double(std::string)> vals) const;
+    double eval(std::function<double(std::size_t)> vals) const;
 
     friend std::ostream & operator<< (std::ostream & out, const individual & i);  
 };

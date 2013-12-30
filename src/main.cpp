@@ -20,28 +20,6 @@ int main(int argc, char ** argv) {
     const std::size_t pop_size = 30;
     std::vector<std::string> vars = { "x" };
 
-    auto fitness = [] (const individual& e) {
-        std::vector<double> vals;
-        for (double i = -1; i <= 1; i += 0.1) {
-            double opt = i * std::sin(i);
-            vals.push_back(std::pow(opt - e.eval([&] (std::string) { return i; }), 2));
-        }
-
-        double sum = 0;
-        std::for_each(
-                vals.begin(), vals.end(),
-                [&] (double c) { sum += c; }
-             );
-
-        return sum / vals.size();
-    };
-
-    genetics g;
-    g.set_fitness(fitness);
-    g.run();
-
-    return 0;
-
     population p;
     p.reserve(10);
 

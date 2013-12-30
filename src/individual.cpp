@@ -101,7 +101,7 @@ std::size_t individual::hash() const {
     return v->get_result();
 }
 
-double individual::eval(std::function<double(std::string)> vals) const {
+double individual::eval(std::function<double(std::size_t)> vals) const {
     ex::eval_visitor v_impl(vals);
     ex::generic_visitor<ex::eval_visitor> v(v_impl);
     c->accept(v);
@@ -148,7 +148,7 @@ std::unique_ptr<ex::expr> make_leave(const std::vector<std::string> & vars) {
                     new ex::function<ex::base::constant>(random_normal(mean, stddev)));
         case 1:
             /* return variable */
-            std::string var = vars[random_between((std::size_t)0, vars.size() - 1)];
+            std::size_t var = random_between((std::size_t)0, vars.size() - 1);
             return std::unique_ptr<ex::expr>(new ex::function<ex::base::variable>(var));
     }
 

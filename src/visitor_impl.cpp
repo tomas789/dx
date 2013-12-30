@@ -11,7 +11,7 @@ void printer_visitor::visit(ex::expr & e) {
 }
 
 void printer_visitor::visit(ex::function<ex::base::variable> & c) {
-    return_(c.value);
+    return_("x_" + std::to_string(c.value));
 }
 
 void printer_visitor::visit(ex::function<ex::base::constant> & c) {
@@ -59,7 +59,7 @@ void latex_visitor::visit(ex::expr & e) {
 }
 
 void latex_visitor::visit(ex::function<ex::base::variable> & c) {
-    return_(c.value);
+    return_("x_" + std::to_string(c.value));
 }
 
 void latex_visitor::visit(ex::function<ex::base::constant> & c) {

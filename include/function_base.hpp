@@ -11,7 +11,7 @@ namespace ex { namespace base {
 
     struct variable : public function_base { 
         static const std::size_t arity = 0;
-        typedef globals::string_type value_type;
+        typedef globals::size_type value_type;
         value_type value;
     };
 
