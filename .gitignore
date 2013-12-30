@@ -25,8 +25,12 @@ dx
 # CMake
 build
 
+# YouCompleteMe
+**/.ycm_extra_conf.pyc
+
 # Others
 *.bkp
 *.old
 *.gch
 *.d
+git_stats
