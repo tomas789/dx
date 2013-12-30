@@ -22,6 +22,9 @@ dx
 # OS X
 .DS_Store
 
+# CMake
+build
+
 # Others
 *.bkp
 *.old
