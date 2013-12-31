@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wtautological-compare -O0 -ggdb -Wall -std=c++0x")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-tautological-compare -O0 -ggdb -Wall -std=c++0x")
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set (GP_SOURCE
