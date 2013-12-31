@@ -37,17 +37,16 @@ struct abstract_visitor {
  *  \tparam U visitor type
  *
  *  \todo Use Loki-style visitor generated from typelist.
+ *         -- Huh, such a stupid idea. Shame yourself.
  */
 template <typename U>
 class generic_visitor : public abstract_visitor {
     /** \brief visitor instance */
     U u;
 public:
-    generic_visitor() {
-        u.pass_generic(this);
-    }
-
-    generic_visitor(const U & u_) : u(u_) {
+    template <typename ... TList>
+    generic_visitor(TList && ... plist) 
+      : u(std::forward<TList>(plist)...) {
         u.pass_generic(this);
     }
 
